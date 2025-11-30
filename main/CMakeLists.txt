@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS
+        "breadbuddy_prototyp.c"
+        "sensor_resistance.c"
+        "sensor_ethanol.c"  
+        "httprequest.c"
+        "connect_wifi.c"
+    INCLUDE_DIRS 
+        "."     
+    PRIV_REQUIRES 
+        esp_adc
+        esp_driver_gpio
+        nvs_flash
+        esp_wifi
+        driver
+)
+                       

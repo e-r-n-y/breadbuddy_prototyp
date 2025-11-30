@@ -1,0 +1,88 @@
+dependencies:
+  esp-idf-lib/esp_idf_lib_helpers:
+    component_hash: a8049b1e609679fb54b2d57b0399dd29c4d1fda09a797edac9926f7810aa5703
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    targets:
+    - esp32
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    - esp32c61
+    - esp32h2
+    - esp32p4
+    - esp32s2
+    - esp32s3
+    version: 1.3.10
+  esp-idf-lib/i2cdev:
+    component_hash: 11c08f9e1a7d346b5dd763196dc2567cf2209ae49042402c2c2d296624601c14
+    dependencies:
+    - name: esp-idf-lib/esp_idf_lib_helpers
+      registry_url: https://components.espressif.com
+      require: private
+      version: '*'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    targets:
+    - esp32
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    - esp32c61
+    - esp32h2
+    - esp32p4
+    - esp32s2
+    - esp32s3
+    version: 2.0.8
+  esp-idf-lib/scd4x:
+    component_hash: 75ce5e78e24eb0c1e601564f0ded14ea8d994de6e499c10b5f1700f557df8563
+    dependencies:
+    - name: esp-idf-lib/esp_idf_lib_helpers
+      registry_url: https://components.espressif.com
+      require: private
+      version: '*'
+    - name: esp-idf-lib/i2cdev
+      registry_url: https://components.espressif.com
+      require: private
+      version: '*'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    targets:
+    - esp32
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    - esp32c61
+    - esp32h2
+    - esp32p4
+    - esp32s2
+    - esp32s3
+    version: 1.0.8
+  idf:
+    source:
+      type: idf
+    version: 5.5.1
+  larryli/mlx90614:
+    component_hash: 4a99807576ef39b9fdbf3017d52debdef9cb5672712380891ec6781673a8d4b3
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.2'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.1.0
+direct_dependencies:
+- esp-idf-lib/scd4x
+- idf
+- larryli/mlx90614
+manifest_hash: 93ebc42cf0dcc82dd3769d942c3126cb2ca9140d6f7d887269eb33438739c7ff
+target: esp32s3
+version: 2.0.0

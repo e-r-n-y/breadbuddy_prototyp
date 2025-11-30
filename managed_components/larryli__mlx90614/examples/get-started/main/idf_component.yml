@@ -1,0 +1,5 @@
+dependencies:
+  idf: '>=5.2'
+  larryli/mlx90614:
+    version: '*'
+description: Get started for MLX90614
