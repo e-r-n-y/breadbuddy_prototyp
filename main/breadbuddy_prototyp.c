@@ -30,6 +30,11 @@ adc_oneshot_unit_handle_t adc1_handle;
 // für temp Sensor
 #include "sensor_temp.h"
 
+// für co2 Sensor
+#include "sensor_co2.h"
+i2c_dev_t dev = {0};
+uint32_t adc_co2_ppm = 0;
+
 // Semaphoren
 // SemaphoreHandle_t sema_resistance = NULL;
 SemaphoreHandle_t sema_adc = NULL;
@@ -41,6 +46,7 @@ static char *messungsname = "XXXXXX_XXXX_breadbuddy_prototyp";
 const int messungsDelay = 5000;
 // #define MESSUNGSDELAY 5000 // 900000 entsprechen 15 Minuten
 
+/*
 // für SCD41 CO2 Sensor
 #include <scd4x.h>
 #include <i2cdev.h> // Add this include
@@ -52,6 +58,7 @@ static const char *TAG_CO2 = "SCD41-CO2";
 static i2c_dev_t dev = {0};
 static uint32_t adc_co2_ppm = 0;
 #define CO2_I2C_PORT 0
+*/
 
 /*
 // für elektrischen Widerstand
@@ -82,9 +89,9 @@ static const char *TAG_RES = "ADC-Resistance";
 static const char *TAG_TEMP = "MLX90614-Temperatur";
 */
 
+/*
 // FUNKTIONEN FÜR WIDERSTANDSMESSUNG
 // =================================
-/*
 static bool adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle)
 {
     adc_cali_handle_t handle = NULL;
@@ -252,6 +259,7 @@ void resistance_task(void *pvParameters)
 }
 */
 
+/*
 void co2_task(void *pvParameters)
 {
     vTaskDelay(pdMS_TO_TICKS(5000));
@@ -290,6 +298,7 @@ void co2_task(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(messungsDelay));
     }
 }
+*/
 
 /*
 void ethanol_task(void *pvParameters)
@@ -412,9 +421,11 @@ void app_main(void)
     // Binary semaphore starts empty, must give it once to make it available
     xSemaphoreGive(sema_adc);
 
+    /*
     // Initialize i2cdev library - MUST be called before any I2C operations
     ESP_ERROR_CHECK(i2cdev_init());
     ESP_LOGI(TAG_CO2, "I2C device library initialized");
+    */
 
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
@@ -440,6 +451,8 @@ void app_main(void)
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
 
     // i2c init
+    init_co2_sensor();
+    /*
     // Configure GPIO pins with internal pull-ups before I2C initialization
     ESP_LOGI(TAG_CO2, "Configuring GPIO pins with pull-ups...");
     gpio_config_t io_conf = {
@@ -448,23 +461,24 @@ void app_main(void)
         .pull_up_en = GPIO_PULLUP_ENABLE,  // Enable internal pull-ups
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .intr_type = GPIO_INTR_DISABLE};
-    ESP_ERROR_CHECK(gpio_config(&io_conf));
+        ESP_ERROR_CHECK(gpio_config(&io_conf));
 
-    // Initialize I2C device descriptor
-    ESP_ERROR_CHECK(scd4x_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
+        // Initialize I2C device descriptor
+        ESP_ERROR_CHECK(scd4x_init_desc(&dev, 0, CONFIG_EXAMPLE_I2C_MASTER_SDA, CONFIG_EXAMPLE_I2C_MASTER_SCL));
 
-    // Give I2C bus time to stabilize
-    vTaskDelay(pdMS_TO_TICKS(500));
+        // Give I2C bus time to stabilize
+        vTaskDelay(pdMS_TO_TICKS(500));
 
-    ESP_LOGI(TAG_CO2, "Initializing SCD41 sensor at address 0x%02X...", SCD41_I2C_ADDRESS);
+        ESP_LOGI(TAG_CO2, "Initializing SCD41 sensor at address 0x%02X...", SCD41_I2C_ADDRESS);
 
-    // Verify that our main device descriptor is set to the correct address
-    ESP_LOGI(TAG_CO2, "Device descriptor address: 0x%02X", dev.addr);
-    if (dev.addr != SCD41_I2C_ADDRESS)
-    {
-        ESP_LOGI(TAG_CO2, "Setting device address to 0x%02X", SCD41_I2C_ADDRESS);
-        dev.addr = SCD41_I2C_ADDRESS;
-    }
+        // Verify that our main device descriptor is set to the correct address
+        ESP_LOGI(TAG_CO2, "Device descriptor address: 0x%02X", dev.addr);
+        if (dev.addr != SCD41_I2C_ADDRESS)
+        {
+            ESP_LOGI(TAG_CO2, "Setting device address to 0x%02X", SCD41_I2C_ADDRESS);
+            dev.addr = SCD41_I2C_ADDRESS;
+        }
+    */
 
     /* Der Teil mit der configMinimal ist viel zu viel Speicher!!
     xTaskCreate(resistance_task, "resistance", configMINIMAL_STACK_SIZE * 8, NULL, 5, NULL);

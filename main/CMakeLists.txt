@@ -3,7 +3,8 @@ idf_component_register(
         "breadbuddy_prototyp.c"
         "sensor_resistance.c"
         "sensor_ethanol.c"
-        "sensor_temp.c"  
+        "sensor_temp.c"
+        "sensor_co2.c"  
         "httprequest.c"
         "connect_wifi.c"
     INCLUDE_DIRS 
