@@ -14,17 +14,29 @@
 
 // für elektrischen Widerstand
 #include "sensor_resistance.h"
+int adc_res_raw = 0;
+int adc_res_voltage = 0;
+uint32_t resistance = 0;
 
-// Settings für Messung
-static char *messungsname = "XXXXXX_XXXX_breadbuddy_prototyp";
-const int messungsDelay = 5000;
-// #define MESSUNGSDELAY 5000 // 900000 entsprechen 15 Minuten
+// für ethanol Messung
+#include "sensor_ethanol.h"
+int adc_eth_raw = 0;
+float adc_eth_voltage = 0.0;
+uint32_t adc_eth_ppm = 0;
+
+// für ADC - weil beide nutzen den ADC1
+adc_oneshot_unit_handle_t adc1_handle;
 
 // Semaphoren
 // SemaphoreHandle_t sema_resistance = NULL;
 SemaphoreHandle_t sema_adc = NULL;
 // SemaphoreHandle_t sema_co2 = NULL;
 // SemaphoreHandle_t sema_ethanol = NULL;
+
+// Settings für Messung
+static char *messungsname = "XXXXXX_XXXX_breadbuddy_prototyp";
+const int messungsDelay = 5000;
+// #define MESSUNGSDELAY 5000 // 900000 entsprechen 15 Minuten
 
 // für SCD41 CO2 Sensor
 #include <scd4x.h>
@@ -50,22 +62,12 @@ static uint32_t adc_co2_ppm = 0;
 #define RESISTOR_VALUE_OHMS 6700 // Value of the known resistor in ohms
 static const char *TAG_RES = "ADC-Resistance";
 */
-int adc_res_raw = 0;
-int adc_res_voltage = 0;
-uint32_t resistance = 0;
 
 // für Ethanolmessung
-#include "sensor_ethanol.h"
-
 // #define ETH_ADC_ATTEN ADC_ATTEN_DB_12
 // #define ETH_ADC_CHANNEL ADC_CHANNEL_7 // ist Pin 8
 // #define ETH_ADC_WIDTH ADC_BITWIDTH_DEFAULT
 // static const char *TAG_ETH = "ADC-Ethanol";
-int adc_eth_raw = 0;
-float adc_eth_voltage = 0.0;
-uint32_t adc_eth_ppm = 0;
-
-adc_oneshot_unit_handle_t adc1_handle;
 
 // für Tempsensor
 #include "mlx90614.h"
@@ -284,6 +286,7 @@ void co2_task(void *pvParameters)
     }
 }
 
+/*
 void ethanol_task(void *pvParameters)
 {
     // ADC1 CONFIG
@@ -331,6 +334,7 @@ void ethanol_task(void *pvParameters)
         }
     }
 }
+*/
 
 static void temp_task(void *pvParameter)
 {
