@@ -4,7 +4,8 @@ idf_component_register(
         "sensor_resistance.c"
         "sensor_ethanol.c"
         "sensor_temp.c"
-        "sensor_co2.c"  
+        "sensor_co2.c"
+        "connect_database.c"  
         "httprequest.c"
         "connect_wifi.c"
     INCLUDE_DIRS 

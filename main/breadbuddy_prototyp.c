@@ -27,13 +27,15 @@ uint32_t adc_eth_ppm = 0;
 // für ADC - weil beide nutzen den ADC1
 adc_oneshot_unit_handle_t adc1_handle;
 
-// für temp Sensor
-#include "sensor_temp.h"
-
 // für co2 Sensor
 #include "sensor_co2.h"
 i2c_dev_t dev = {0};
 uint32_t adc_co2_ppm = 0;
+
+// für temp Sensor
+#include "sensor_temp.h"
+uint32_t temp_obj = 0;
+uint32_t temp_amb = 0;
 
 // Semaphoren
 // SemaphoreHandle_t sema_resistance = NULL;
@@ -392,6 +394,7 @@ static void temp_task(void *pvParameter)
 }
 */
 
+/*
 void database_task(void *pvParameters)
 {
     // TODO: diese Funktion muss die Daten von den anderen Tasks bekommen
@@ -403,6 +406,7 @@ void database_task(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(messungsDelay));
     }
 }
+*/
 
 void app_main(void)
 {
@@ -443,6 +447,7 @@ void app_main(void)
     {
     }
 
+    // initialisierung des ADC
     adc_oneshot_unit_init_cfg_t init_config1 = {
         .unit_id = ADC_UNIT_1,
         .ulp_mode = ADC_ULP_MODE_DISABLE,
