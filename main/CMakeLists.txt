@@ -2,7 +2,8 @@ idf_component_register(
     SRCS
         "breadbuddy_prototyp.c"
         "sensor_resistance.c"
-        "sensor_ethanol.c"  
+        "sensor_ethanol.c"
+        "sensor_temp.c"  
         "httprequest.c"
         "connect_wifi.c"
     INCLUDE_DIRS 

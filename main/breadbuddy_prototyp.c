@@ -27,6 +27,9 @@ uint32_t adc_eth_ppm = 0;
 // für ADC - weil beide nutzen den ADC1
 adc_oneshot_unit_handle_t adc1_handle;
 
+// für temp Sensor
+#include "sensor_temp.h"
+
 // Semaphoren
 // SemaphoreHandle_t sema_resistance = NULL;
 SemaphoreHandle_t sema_adc = NULL;
@@ -70,12 +73,14 @@ static const char *TAG_RES = "ADC-Resistance";
 // static const char *TAG_ETH = "ADC-Ethanol";
 
 // für Tempsensor
+/*
 #include "mlx90614.h"
 #define TEMP_SCL_PIN GPIO_NUM_36
 #define TEMP_SDA_PIN GPIO_NUM_35
 #define MASTER_FREQUENCY 100000
 #define TEMP_I2C_PORT 1
 static const char *TAG_TEMP = "MLX90614-Temperatur";
+*/
 
 // FUNKTIONEN FÜR WIDERSTANDSMESSUNG
 // =================================
@@ -336,6 +341,7 @@ void ethanol_task(void *pvParameters)
 }
 */
 
+/*
 static void temp_task(void *pvParameter)
 {
     i2c_master_bus_config_t i2c_bus_config = {
@@ -375,6 +381,7 @@ static void temp_task(void *pvParameter)
         vTaskDelay(pdMS_TO_TICKS(messungsDelay));
     }
 }
+*/
 
 void database_task(void *pvParameters)
 {
