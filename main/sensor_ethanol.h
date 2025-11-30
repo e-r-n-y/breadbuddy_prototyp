@@ -6,4 +6,4 @@
 extern const char *TAG_ETH;
 extern int adc_eth_raw;
 extern float adc_eth_voltage;
-extern uint32_t adc_eth_ppm;
+// extern uint32_t adc_eth_ppm;

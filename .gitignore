@@ -56,3 +56,6 @@ dkms.conf
 
 # complete build folder
 build/
+
+# vscode workspace
+*.code-workspace
