@@ -78,14 +78,14 @@ void resistance_task(void *pvParameters)
 
     // GPIO Config for sensor power control
     ESP_ERROR_CHECK(gpio_config(&(gpio_config_t){
-        .pin_bit_mask = (1ULL << 6),
+        .pin_bit_mask = (1ULL << RES_GPIO),
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_ENABLE,
         .intr_type = GPIO_INTR_DISABLE,
     }));
-    gpio_dump_io_configuration(stdout, (1ULL << 6));
-    ESP_ERROR_CHECK(gpio_set_level(6, 0));
+    gpio_dump_io_configuration(stdout, (1ULL << RES_GPIO));
+    ESP_ERROR_CHECK(gpio_set_level(RES_GPIO, 0));
 
     // ADC1 CONFIG
     // ==============================
@@ -102,7 +102,7 @@ void resistance_task(void *pvParameters)
 
     while (1)
     {
-        if (xSemaphoreTake(sema_adc, (TickType_t)10) == pdTRUE)
+        if (xSemaphoreTake(sema_measurement, (TickType_t)10) == pdTRUE)
         {
             // Stack-Nutzung prüfen
             UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);
@@ -110,7 +110,7 @@ void resistance_task(void *pvParameters)
 
             // WIDERSTANDSMESSUNG
             // ==============================
-            ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)6, 1));
+            ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)RES_GPIO, 1));
 
             vTaskDelay(pdMS_TO_TICKS(5000)); // wait for sensor to stabilize
 
@@ -154,8 +154,8 @@ void resistance_task(void *pvParameters)
             }
             resistance = r2;
 
-            ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)6, 0));
-            xSemaphoreGive(sema_adc);
+            ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)RES_GPIO, 0));
+            xSemaphoreGive(sema_measurement);
             vTaskDelay(pdMS_TO_TICKS(messungsDelay));
         }
     }

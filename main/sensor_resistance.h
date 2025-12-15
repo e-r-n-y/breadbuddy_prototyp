@@ -22,14 +22,15 @@
 // Allgemeines
 #include <driver/gpio.h>
 extern const char *TAG_RES;
-extern SemaphoreHandle_t sema_adc;
+extern SemaphoreHandle_t sema_measurement;
 extern adc_oneshot_unit_handle_t adc1_handle;
 extern const int messungsDelay;
 
 // Settings für ADC
 #define RES_ADC_ATTEN ADC_ATTEN_DB_12
-#define RES_ADC_CHANNEL ADC_CHANNEL_3
+#define RES_ADC_CHANNEL ADC_CHANNEL_9
 #define RES_ADC_WIDTH ADC_BITWIDTH_DEFAULT
+#define RES_GPIO GPIO_NUM_18
 
 // Werte für Messung
 #define RESISTOR_VALUE_OHMS 6700 // Value of the known resistor in ohms

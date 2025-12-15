@@ -19,7 +19,7 @@ void ethanol_task(void *pvParameters)
     {
         // Ethanolmessung
         // ==============================
-        if (xSemaphoreTake(sema_adc, (TickType_t)10) == pdTRUE)
+        if (xSemaphoreTake(sema_measurement, (TickType_t)10) == pdTRUE)
         {
             // Stack-Nutzung prüfen
             UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);
@@ -44,7 +44,7 @@ void ethanol_task(void *pvParameters)
             adc_eth_ppm = (adc_eth_raw * 500) / 4095; // 12-bit ADC: 0-4095 (2^12 - 1)
             ESP_LOGI(TAG_ETH, "Ethanol PPM: %d\n", adc_eth_ppm);
 
-            xSemaphoreGive(sema_adc);
+            xSemaphoreGive(sema_measurement);
             vTaskDelay(pdMS_TO_TICKS(messungsDelay));
         }
     }

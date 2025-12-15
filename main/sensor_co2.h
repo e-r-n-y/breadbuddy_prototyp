@@ -20,16 +20,17 @@
 
 // Allgemeines
 extern const char *TAG_CO2;
+extern SemaphoreHandle_t sema_measurement;
 extern const int messungsDelay;
 
 // Settings for Sensor
-#define CONFIG_EXAMPLE_I2C_MASTER_SCL GPIO_NUM_13
-#define CONFIG_EXAMPLE_I2C_MASTER_SDA GPIO_NUM_14
+#define CO2_I2C_MASTER_SCL GPIO_NUM_1
+#define CO2_I2C_MASTER_SDA GPIO_NUM_2
 // SCD41 I2C address according to datasheet
 #define SCD41_I2C_ADDRESS 0x62
 #define CO2_I2C_PORT 0
 
-extern i2c_dev_t dev;
+extern i2c_dev_t co2_dev;
 extern uint32_t adc_co2_ppm;
 
 // Funktionen

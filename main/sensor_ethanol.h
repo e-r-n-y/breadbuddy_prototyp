@@ -22,13 +22,13 @@
 // Allgemeines
 #include <driver/gpio.h>
 extern const char *TAG_ETH;
-extern SemaphoreHandle_t sema_adc;
+extern SemaphoreHandle_t sema_measurement;
 extern adc_oneshot_unit_handle_t adc1_handle;
 extern const int messungsDelay;
 
 // Settings für ADC
 #define ETH_ADC_ATTEN ADC_ATTEN_DB_12
-#define ETH_ADC_CHANNEL ADC_CHANNEL_7 // ist Pin 8
+#define ETH_ADC_CHANNEL ADC_CHANNEL_2 // ist Pin 3
 #define ETH_ADC_WIDTH ADC_BITWIDTH_DEFAULT
 
 // Werte für Messung
