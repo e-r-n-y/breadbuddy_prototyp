@@ -39,8 +39,8 @@ extern const int messungsDelay;
 #define MLX90614_TA 0x06    // Ambient temperature
 #define MLX90614_TOBJ1 0x07 // Object temperature
 // Externe Variablen
-extern uint32_t temp_obj;
-extern uint32_t temp_amb;
+extern float temp_obj;
+extern float temp_amb;
 extern i2c_dev_t temp_dev;
 esp_err_t mlx90614_read_temperature(i2c_dev_t *dev, uint8_t reg, float *temperature);
 void init_temp_sensor();

@@ -7,7 +7,7 @@ void database_task(void *pvParameters)
 
     while (1)
     {
-        http_post_res_co2_eth(messungsname, resistance, adc_co2_ppm, adc_eth_ppm);
+        http_post_mostdata(messungsname, temp_obj, temp_amb_co2, humidity, resistance, co2_ppm, adc_eth_ppm);
         vTaskDelay(pdMS_TO_TICKS(messungsDelay));
     }
 }

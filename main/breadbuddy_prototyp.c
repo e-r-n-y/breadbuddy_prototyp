@@ -30,7 +30,9 @@ adc_oneshot_unit_handle_t adc1_handle;
 // für co2 Sensor
 #include "sensor_co2.h"
 i2c_dev_t co2_dev = {0};
-uint32_t adc_co2_ppm = 0;
+uint32_t co2_ppm = 0;
+float temp_amb_co2 = 0;
+float humidity = 0.0;
 #define I2C_MASTER_SCL GPIO_NUM_1
 #define I2C_MASTER_SDA GPIO_NUM_2
 #define I2C_PORT 0
@@ -39,8 +41,8 @@ i2c_config_t i2c_cfg;
 // für temp Sensor
 #include "sensor_temp.h"
 i2c_dev_t temp_dev = {0};
-uint32_t temp_obj = 0;
-uint32_t temp_amb = 0;
+float temp_obj = 0.0;
+float temp_amb = 0.0;
 
 // datenbank verbindung
 #include "connect_database.h"
@@ -49,8 +51,8 @@ uint32_t temp_amb = 0;
 SemaphoreHandle_t sema_measurement = NULL;
 
 // Settings für Messung
-char *messungsname = "251216_0715_breadbuddy_prototyp";
-const int messungsDelay = 5000;
+char *messungsname = "251219_1000_breadbuddy_prototyp";
+const int messungsDelay = 900000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
 {
@@ -120,5 +122,5 @@ void app_main(void)
     xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
     xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
     xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
-    //  xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
+    xTaskCreate(database_task, "database", 8192, NULL, 5, NULL);
 }

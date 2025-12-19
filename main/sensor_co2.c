@@ -79,7 +79,7 @@ void co2_task(void *pvParameters)
         xSemaphoreGive(sema_measurement);
     }
     uint16_t co2;
-    float temperature, humidity;
+    float temperature, current_humidity;
     vTaskDelay(pdMS_TO_TICKS(5000));
 
     while (1)
@@ -90,7 +90,7 @@ void co2_task(void *pvParameters)
             UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);
             ESP_LOGW(TAG_CO2, "Stack remaining: %u words", stackRemaining);
 
-            esp_err_t res = scd4x_read_measurement(&co2_dev, &co2, &temperature, &humidity);
+            esp_err_t res = scd4x_read_measurement(&co2_dev, &co2, &temperature, &current_humidity);
             if (res != ESP_OK)
             {
                 ESP_LOGE(TAG_CO2, "Error reading results %d (%s)", res, esp_err_to_name(res));
@@ -109,9 +109,11 @@ void co2_task(void *pvParameters)
 
             ESP_LOGI(TAG_CO2, "CO2: %u ppm", co2);
             ESP_LOGI(TAG_CO2, "Temperature: %.2f °C", temperature);
-            ESP_LOGI(TAG_CO2, "Humidity: %.2f %%\n", humidity);
+            ESP_LOGI(TAG_CO2, "Humidity: %.2f %%\n", current_humidity);
 
-            adc_co2_ppm = co2;
+            co2_ppm = co2;
+            humidity = current_humidity;
+            temp_amb_co2 = temperature;
             xSemaphoreGive(sema_measurement);
             vTaskDelay(pdMS_TO_TICKS(messungsDelay));
         }

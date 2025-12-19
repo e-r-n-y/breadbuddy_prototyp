@@ -18,3 +18,4 @@
 void http_post_measurement(const char *messungsname, int widerstand_ohm);
 void http_post_resistance_volume(const char *messungsname, int widerstand_ohm, float volume);
 void http_post_res_co2_eth(const char *messungsname, int widerstand_ohm, int co2_ppm, int ethanol_ppm);
+void http_post_mostdata(const char *messungsname, float temp_obj, float temp_amb, float humidity, int widerstand_ohm, int co2_ppm, int ethanol_ppm);

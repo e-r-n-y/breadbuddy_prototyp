@@ -93,8 +93,8 @@ void temp_task(void *pvParameter)
                 ESP_LOGI(TAG_TEMP, "Ambient Temperature: %.2f °C", temp_ambient);
 
                 // Update globale Variablen
-                temp_obj = (uint32_t)(temp_object * 100); // In Hundertstel Grad
-                temp_amb = (uint32_t)(temp_ambient * 100);
+                temp_obj = temp_object;
+                temp_amb = temp_ambient;
             }
             else
             {

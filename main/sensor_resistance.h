@@ -33,7 +33,7 @@ extern const int messungsDelay;
 #define RES_GPIO GPIO_NUM_18
 
 // Werte für Messung
-#define RESISTOR_VALUE_OHMS 6700 // Value of the known resistor in ohms
+#define RESISTOR_VALUE_OHMS 98400 // Value of the known resistor in ohms
 extern int adc_res_raw;
 extern int adc_res_voltage;
 extern uint32_t resistance;

@@ -20,10 +20,12 @@
 extern const int messungsDelay;
 extern char *messungsname;
 extern uint32_t resistance;
-extern uint32_t adc_co2_ppm;
+extern uint32_t co2_ppm;
 extern uint32_t adc_eth_ppm;
-extern uint32_t temp_obj;
-extern uint32_t temp_amb;
+extern float temp_obj;
+extern float temp_amb;
+extern float humidity;
+extern float temp_amb_co2;
 
 // Funktionen
 void database_task(void *pvParameters);

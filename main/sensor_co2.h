@@ -31,7 +31,9 @@ extern const int messungsDelay;
 #define CO2_I2C_PORT 0
 
 extern i2c_dev_t co2_dev;
-extern uint32_t adc_co2_ppm;
+extern uint32_t co2_ppm;
+extern float humidity;
+extern float temp_amb_co2;
 
 // Funktionen
 void init_co2_sensor();
