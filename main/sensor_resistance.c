@@ -125,19 +125,19 @@ void resistance_task(void *pvParameters)
 
             ESP_LOGI(TAG_RES, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, RES_ADC_CHANNEL, adc_res_raw);
 
+            int vin = 3260; // Assuming a 3.3V supply voltage in mV - empirisch ermittelt (gemessen am GPIO 3.24 V)
             // adc_res_voltage = adc_res_raw * 1750 / 4095; // Convert raw to voltage in mV for 12-bit ADC
             ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan3_handle, adc_res_raw, &adc_res_voltage));
-            adc_res_voltage = (int)(adc_res_voltage * 3300.0 / 3260.0); // adjust for voltage divider
+            adc_res_voltage = (int)(adc_res_voltage * 3300.0 / vin); // adjust for voltage divider
             ESP_LOGI(TAG_RES, "ADC%d Channel[%d] Voltage: %d mV", ADC_UNIT_1 + 1, RES_ADC_CHANNEL, adc_res_voltage);
             // Calculate the resistance of the unknown resistor
             // Using the voltage divider formula: Vout = Vin * (R2 / (R1 + R2))
             // Rearranged to find R2: R2 = R1 * (Vout / (Vin - Vout))
-            int vin = 3300; // Assuming a 3.3V supply voltage in mV
             int vout = adc_res_voltage;
             int r1 = RESISTOR_VALUE_OHMS; // Known resistor value in ohms
             float r2 = r1 * vout / (vin - vout);
 
-            if (vout >= vin)
+            if (vout >= 3150) // wenn nichts dran hängt werden 3200 mV gemessen
             {
                 ESP_LOGW(TAG_RES, "Measured voltage is greater than or equal to supply voltage. Check connections.");
             }
