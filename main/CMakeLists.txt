@@ -11,6 +11,7 @@ idf_component_register(
         "connect_wifi.c"
         "webserver.c"
         "current_time.c"
+        "probe_data.c"
     INCLUDE_DIRS 
         "."     
     PRIV_REQUIRES 
@@ -23,6 +24,8 @@ idf_component_register(
         esp_http_server
         spi_flash
         spiffs
+
+        json
 )
 
 spiffs_create_partition_image(storage ../data FLASH_IN_PROJECT)

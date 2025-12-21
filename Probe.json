@@ -1,0 +1,21 @@
+{
+    "starter": {
+        "menge_g": 0.0,
+        "temperatur_c": 0.0
+    },
+    "wasser": {
+        "menge_g": 0.0,
+        "temperatur_c": 0.0
+    },
+    "mehl": {
+        "menge_g": 0.0,
+        "temperatur_c": 0.0
+    },
+    "salz": {
+        "menge_g": 0.0
+    },
+    "probe": {
+        "menge_g": 0.0,
+        "temperatur_c": 0.0
+    }
+}

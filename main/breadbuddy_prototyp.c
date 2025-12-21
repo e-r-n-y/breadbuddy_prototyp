@@ -44,8 +44,14 @@ i2c_dev_t temp_dev = {0};
 float temp_obj = 0.0;
 float temp_amb = 0.0;
 
+// für PH-Werte
+float ph_value = 0.0;
+
 // datenbank verbindung
 #include "connect_database.h"
+#include "probe_data.h"
+probe_data_t probendaten;
+char notizen[1024];
 
 // webserver
 #include "webserver.h"

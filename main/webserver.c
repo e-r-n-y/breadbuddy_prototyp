@@ -2,6 +2,8 @@
 
 const char *WEB_TAG = "Webserver";
 int web_state = 0;
+extern float ph_value;
+char last_ph_time[64] = "---";
 char index_html[4096];
 char messung_html[4096];
 char beenden_html[4096];
@@ -82,10 +84,180 @@ static void init_web_page_buffers(void)
 // diese Funktion sollte einen Inhalt an den browser senden
 esp_err_t send_web_page(httpd_req_t *req, const char *content)
 {
-    int response;
-    sprintf(response_data, content);
-    response = httpd_resp_send(req, response_data, HTTPD_RESP_USE_STRLEN);
-    return response;
+    // Größerer Buffer für dynamischen Content
+    char *response_buffer = malloc(8192);
+    if (response_buffer == NULL)
+    {
+        ESP_LOGE(WEB_TAG, "Failed to allocate memory for response");
+        return ESP_ERR_NO_MEM;
+    }
+
+    // Kopiere Content in Buffer
+    strncpy(response_buffer, content, 8191);
+    response_buffer[8191] = '\0';
+
+    // Ersetze Platzhalter
+    char *temp = malloc(8192);
+    if (temp == NULL)
+    {
+        free(response_buffer);
+        return ESP_ERR_NO_MEM;
+    }
+
+    // Ersetze {{MEASUREMENT_ID}}
+    char *pos = strstr(response_buffer, "{{MEASUREMENT_ID}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        size_t after_len = strlen(pos + strlen("{{MEASUREMENT_ID}}"));
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 measurement_id,
+                 pos + strlen("{{MEASUREMENT_ID}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{START_TIME}}
+    pos = strstr(response_buffer, "{{START_TIME}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 measurement_start_time,
+                 pos + strlen("{{START_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{START_DATE}}
+    pos = strstr(response_buffer, "{{START_DATE}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 measurement_start_date,
+                 pos + strlen("{{START_DATE}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{RESISTANCE}}
+    char resistance_str[32];
+    snprintf(resistance_str, sizeof(resistance_str), "%lu", (unsigned long)resistance);
+    pos = strstr(response_buffer, "{{RESISTANCE}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 resistance_str,
+                 pos + strlen("{{RESISTANCE}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{CO2}}
+    char co2_str[32];
+    snprintf(co2_str, sizeof(co2_str), "%lu", (unsigned long)co2_ppm);
+    pos = strstr(response_buffer, "{{CO2}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 co2_str,
+                 pos + strlen("{{CO2}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{ETHANOL}}
+    char ethanol_str[32];
+    snprintf(ethanol_str, sizeof(ethanol_str), "%lu", (unsigned long)adc_eth_ppm);
+    pos = strstr(response_buffer, "{{ETHANOL}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 ethanol_str,
+                 pos + strlen("{{ETHANOL}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{TEMP_AMB}}
+    char temp_amb_str[32];
+    snprintf(temp_amb_str, sizeof(temp_amb_str), "%.1f", temp_amb);
+    pos = strstr(response_buffer, "{{TEMP_AMB}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 temp_amb_str,
+                 pos + strlen("{{TEMP_AMB}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{TEMP_OBJ}}
+    char temp_obj_str[32];
+    snprintf(temp_obj_str, sizeof(temp_obj_str), "%.1f", temp_obj);
+    pos = strstr(response_buffer, "{{TEMP_OBJ}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 temp_obj_str,
+                 pos + strlen("{{TEMP_OBJ}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{HUMIDITY}}
+    char humidity_str[32];
+    snprintf(humidity_str, sizeof(humidity_str), "%.1f", humidity);
+    pos = strstr(response_buffer, "{{HUMIDITY}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 humidity_str,
+                 pos + strlen("{{HUMIDITY}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{LAST_PH}}
+    char last_ph_str[32];
+    snprintf(last_ph_str, sizeof(last_ph_str), "%.2f", ph_value);
+    pos = strstr(response_buffer, "{{LAST_PH}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 last_ph_str,
+                 pos + strlen("{{LAST_PH}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{LAST_PH_TIME}}
+    pos = strstr(response_buffer, "{{LAST_PH_TIME}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 last_ph_time,
+                 pos + strlen("{{LAST_PH_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Sende Response
+    int result = httpd_resp_send(req, response_buffer, HTTPD_RESP_USE_STRLEN);
+
+    free(temp);
+    free(response_buffer);
+
+    return result;
 }
 
 esp_err_t get_req_handler(httpd_req_t *req)
@@ -111,9 +283,8 @@ esp_err_t get_req_handler(httpd_req_t *req)
     return send_web_page(req, index_html);
 }
 
-char *readValue(char *buf, char *key)
+size_t readValue(char *buf, char *key, char *output, size_t output_size)
 {
-    char value[64] = {0};
     char keyname[64] = {0};
 
     snprintf(keyname, sizeof(keyname), "%s=", key);
@@ -125,19 +296,21 @@ char *readValue(char *buf, char *key)
         pos += strlen(keyname);
         char *end = strpbrk(pos, "&\r\n");
         size_t len = end ? (size_t)(end - pos) : strlen(pos);
-        len = MIN(len, sizeof(value) - 1);
-        strncpy(value, pos, len);
-        value[len] = '\0';
-        ESP_LOGI(WEB_TAG, "Value of %s: %s -- WebState: %d", key, value, web_state);
+        len = MIN(len, output_size - 1);
+        strncpy(output, pos, len);
+        output[len] = '\0';
+        ESP_LOGI(WEB_TAG, "Value of %s: %s -- WebState: %d", key, output, web_state);
     }
-    return value;
+    return 0;
 }
 
 esp_err_t post_req_handler(httpd_req_t *req)
 {
     char buf[256];
-    int ret, remaining = req->content_len;
+    int ret;
+    int remaining = req->content_len;
     char action_value[64] = {0};
+    char buffer[64] = {0};
 
     while (remaining > 0)
     {
@@ -151,33 +324,75 @@ esp_err_t post_req_handler(httpd_req_t *req)
 
         ESP_LOGI(WEB_TAG, "POST data: %s", buf);
 
-        // strcpy(action_value, readValue(buf, "action"));
+        // Action-Feld abrufen
+        readValue(buf, "action", action_value, 64);
+        ESP_LOGW(WEB_TAG, "Action value: __%s__", action_value);
 
-        // Suche nach "action=" und lese den Wert aus
-        char *action_pos = strstr(buf, "action=");
-        if (action_pos)
+        // Beispiel: web_state ändern je nach empfangenen Daten
+        if (strcmp(action_value, "begin") == 0)
         {
-            action_pos += strlen("action=");
-            char *end = strpbrk(action_pos, "&\r\n");
-            size_t len = end ? (size_t)(end - action_pos) : strlen(action_pos);
-            len = MIN(len, sizeof(action_value) - 1);
-            strncpy(action_value, action_pos, len);
-            action_value[len] = '\0';
-            ESP_LOGI(WEB_TAG, "Action value: %s", action_value);
+            // Probendaten abrufen und in struct speichern
+            readValue(buf, "starter_menge", buffer, 64);
+            probendaten.starter.menge_g = atof(buffer);
+            readValue(buf, "starter_temperatur", buffer, 64);
+            probendaten.starter.temperatur_c = atof(buffer);
+            readValue(buf, "wasser_menge", buffer, 64);
+            probendaten.wasser.menge_g = atof(buffer);
+            readValue(buf, "wasser_temperatur", buffer, 64);
+            probendaten.wasser.temperatur_c = atof(buffer);
+            readValue(buf, "mehl_menge", buffer, 64);
+            probendaten.mehl.menge_g = atof(buffer);
+            readValue(buf, "mehl_temperatur", buffer, 64);
+            probendaten.mehl.temperatur_c = atof(buffer);
+            readValue(buf, "salz_menge", buffer, 64);
+            probendaten.salz.menge_g = atof(buffer);
+            readValue(buf, "probe_menge", buffer, 64);
+            probendaten.probe.menge_g = atof(buffer);
+            readValue(buf, "probe_temperatur", buffer, 64);
+            probendaten.probe.temperatur_c = atof(buffer);
+
+            web_state = 1;
+        }
+        else if (strcmp(action_value, "end") == 0)
+        {
+            web_state = 2;
+        }
+        else if (strcmp(action_value, "finally") == 0)
+        {
+            web_state = 3;
+        }
+        else if (strcmp(action_value, "back") == 0 && web_state > 0)
+        {
+            web_state = 1;
+        }
+        else if (strcmp(action_value, "new") == 0)
+        {
+            web_state = 0;
+        }
+        else if (strcmp(action_value, "log_ph") == 0)
+        {
+            // PH-Werte einmelden
+            readValue(buf, "ph_wert", buffer, 64);
+            ph_value = atof(buffer);
+
+            // Aktuelle Zeit für PH-Wert speichern
+            time_t now;
+            struct tm timeinfo;
+            time(&now);
+            localtime_r(&now, &timeinfo);
+            strftime(last_ph_time, sizeof(last_ph_time), "%H:%M", &timeinfo);
+
+            ESP_LOGI(WEB_TAG, "PH-Wert gespeichert: %.2f um %s", ph_value, last_ph_time);
+
+            web_state = 1;
+        }
+        else
+        {
+            web_state = 0;
         }
     }
 
-    // Beispiel: web_state ändern je nach empfangenen Daten
-    if (strcmp(action_value, "begin") == 0)
-        web_state = 1;
-    else if (strcmp(action_value, "end") == 0)
-        web_state = 2;
-    else if (strcmp(action_value, "finally") == 0)
-        web_state = 3;
-    else if (strcmp(action_value, "back") == 0 && web_state > 0)
-        web_state--;
-    else if (strcmp(action_value, "new") == 0)
-        web_state = 0;
+    ESP_LOGW("STATE", "Webstate: %d", web_state);
 
     return get_req_handler(req);
 }
