@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messung beenden</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Messung beenden</h1>
+
+        <form action="/" method="post">
+            <div class="form-group">
+                <label for="notes">Notizen zur Messung</label>
+                <textarea id="notes"
+                    placeholder="z.B. Teig war sehr klebrig, Raumtemperatur war höher als sonst..."></textarea>
+            </div>
+
+            <button class="button button-danger" type="submit" name="action" value="finally">Messung
+                beenden</button>
+        </form>
+
+        <form action="/" method="post">
+            <button class="button" style="margin-top: 1rem;" type="submit" name="action" value="back">Zurück zur
+                Messung</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

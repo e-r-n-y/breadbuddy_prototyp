@@ -102,7 +102,7 @@ void resistance_task(void *pvParameters)
 
     while (1)
     {
-        if (xSemaphoreTake(sema_measurement, (TickType_t)10) == pdTRUE)
+        if (xSemaphoreTake(sema_measurement, (TickType_t)100) == pdTRUE)
         {
             // Stack-Nutzung prüfen
             UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);

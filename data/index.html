@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startseite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Messung</h1>
+
+        <form action="/" method="post">
+
+            <table class="form-table">
+                <tr>
+                    <th>Zutat</th>
+                    <th>Menge [g]</th>
+                    <th>Temperatur [°C]</th>
+                </tr>
+                <tr>
+                    <td>Starter</td>
+                    <td><input class="input_field" type="number" name="starter_menge"></td>
+                    <td><input class="input_field" type="number" name="starter_temperatur"></td>
+                </tr>
+                <tr>
+                    <td>Wasser</td>
+                    <td><input class="input_field" type="number" name="wasser_menge"></td>
+                    <td><input class="input_field" type="number" name="wasser_temperatur"></td>
+                </tr>
+                <tr>
+                    <td>Mehl</td>
+                    <td><input class="input_field" type="number" name="mehl_menge"></td>
+                    <td><input class="input_field" type="number" name="mehl_temperatur"></td>
+                </tr>
+                <tr>
+                    <td>Salz</td>
+                    <td><input class="input_field" type="number" name="salz_menge"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><b>Gesamtteig</b></td>
+                    <td>
+                        <b><label id="gesamt"></label></b>
+                        <input type="hidden" name="gesamtteig_menge" id="gesamtteig_menge">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Probe</td>
+                    <td><input class="input_field" type="number" name="probe_menge"></td>
+                    <td><input class="input_field" type="number" name="probe_temperatur"></td>
+                </tr>
+            </table>
+
+
+            <button class="button" type="submit" name="action" value="begin">Messung starten</button>
+        </form>
+
+    </div>
+
+</body>
+
+</html>
+
+<script>
+    // um die Summe zu bilden
+    function updateSum() {
+        const starter = parseFloat(document.querySelector('input[name="starter_menge"]').value) || 0;
+        const wasser = parseFloat(document.querySelector('input[name="wasser_menge"]').value) || 0;
+        const mehl = parseFloat(document.querySelector('input[name="mehl_menge"]').value) || 0;
+        const salz = parseFloat(document.querySelector('input[name="salz_menge"]').value) || 0;
+        const sum = starter + wasser + mehl + salz;
+        document.getElementById('gesamt').textContent = sum + " g";
+        document.getElementById('gesamtteig_menge').value = sum;
+    }
+
+    // Event Listener für alle relevanten Eingabefelder
+    document.querySelectorAll('input[name="starter_menge"], input[name="wasser_menge"], input[name="mehl_menge"], input[name="salz_menge"]')
+        .forEach(input => input.addEventListener('input', updateSum));
+    window.addEventListener('DOMContentLoaded', updateSum);
+</script>

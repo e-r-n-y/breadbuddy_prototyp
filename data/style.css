@@ -1,0 +1,192 @@
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa;
+    color: #333;
+}
+
+/* das ist der Container der gesamten Maske */
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* da Styling des Eingabefeldes*/
+.input_field {
+    width: 100%;
+    min-width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* um eine Responsiveness zu gewährleisten */
+@media (max-width: 700px) {
+    .container {
+        max-width: 98vw;
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+
+    table,
+    th,
+    td {
+        font-size: 0.95rem;
+    }
+}
+
+
+
+
+/* ab hier betrifft messung.html*/
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.status-display {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.status-display .label {
+    font-size: 1.2rem;
+    color: #495057;
+}
+
+.status-display .time {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+    margin: 0.5rem 0;
+}
+
+.section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.input-group {
+    display: flex;
+    height: 43px;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+
+.button {
+    display: flex;
+    justify-content: center;
+    /* Zentriert den Inhalt horizontal */
+    align-items: center;
+    /* Zentriert den Inhalt vertikal */
+    background-color: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.button-danger {
+    background-color: #dc3545;
+}
+
+.button-danger:hover {
+    background-color: #c82333;
+}
+
+
+h1,
+h2 {
+    margin-top: 0;
+    color: #212529;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item .label {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.info-item p {
+    margin: 0.25rem 0 0 0;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+th {
+    background-color: #f8f9fa;
+}
+
+.notes {
+    background-color: #e9ecef;
+    border-left: 4px solid #007bff;
+    padding: 1rem;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    /* Zeilenumbrüche aus den Notizen beibehalten */
+}
+
+/* Füge diesen Stil hinzu, um das textarea zu gestalten */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1rem;
+    resize: vertical;
+    /* Erlaubt dem Benutzer, die Höhe anzupassen */
+    min-height: 150px;
+    /* Setze eine minimale Höhe */
+}

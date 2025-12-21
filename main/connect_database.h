@@ -17,8 +17,9 @@
 #include "httprequest.h"
 
 // Allgemeines
+extern SemaphoreHandle_t sema_measurement;
 extern const int messungsDelay;
-extern char *messungsname;
+extern char messungsname[64];
 extern uint32_t resistance;
 extern uint32_t co2_ppm;
 extern uint32_t adc_eth_ppm;

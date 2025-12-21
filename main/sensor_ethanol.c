@@ -19,7 +19,7 @@ void ethanol_task(void *pvParameters)
     {
         // Ethanolmessung
         // ==============================
-        if (xSemaphoreTake(sema_measurement, (TickType_t)10) == pdTRUE)
+        if (xSemaphoreTake(sema_measurement, (TickType_t)100) == pdTRUE)
         {
             // Stack-Nutzung prüfen
             UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);

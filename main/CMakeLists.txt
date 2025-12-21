@@ -1,6 +1,7 @@
 idf_component_register(
     SRCS
         "breadbuddy_prototyp.c"
+        "measurement_timing.c"
         "sensor_resistance.c"
         "sensor_ethanol.c"
         "sensor_temp.c"
@@ -8,6 +9,8 @@ idf_component_register(
         "connect_database.c"  
         "httprequest.c"
         "connect_wifi.c"
+        "webserver.c"
+        "current_time.c"
     INCLUDE_DIRS 
         "."     
     PRIV_REQUIRES 
@@ -16,5 +19,11 @@ idf_component_register(
         nvs_flash
         esp_wifi
         driver
+
+        esp_http_server
+        spi_flash
+        spiffs
 )
+
+spiffs_create_partition_image(storage ../data FLASH_IN_PROJECT)
                        

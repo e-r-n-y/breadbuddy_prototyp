@@ -47,11 +47,28 @@ float temp_amb = 0.0;
 // datenbank verbindung
 #include "connect_database.h"
 
+// webserver
+#include "webserver.h"
+
+// timeserver
+#include "current_time.h"
+char measurement_id[64] = "---";
+char measurement_start_time[64] = "---";
+char measurement_start_date[64] = "---";
+
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
+/*
+SemaphoreHandle_t sema_resistance = NULL;
+SemaphoreHandle_t sema_co2 = NULL;
+SemaphoreHandle_t sema_ethanol = NULL;
+SemaphoreHandle_t sema_temperature = NULL;
+SemaphoreHandle_t sema_database = NULL;
+*/
 
 // Settings für Messung
-char *messungsname = "251220_TEST_breadbuddy_prototyp";
+// char *messungsname = "251220_TEST_breadbuddy_prototyp";
+char messungsname[64];
 const int messungsDelay = 5000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
@@ -61,9 +78,46 @@ void app_main(void)
 
     if (sema_measurement == NULL)
     {
-        ESP_LOGE("MAIN", "Failed to create measurement semaphore");
+        ESP_LOGE("MAIN", "Failed to create semaphore for measurement");
         return;
     }
+    /*
+    sema_resistance = xSemaphoreCreateBinary();
+    sema_co2 = xSemaphoreCreateBinary();
+    sema_ethanol = xSemaphoreCreateBinary();
+    sema_temperature = xSemaphoreCreateBinary();
+    sema_database = xSemaphoreCreateBinary();
+
+    if (sema_resistance == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for resistance-Measurement");
+        return;
+    }
+
+    if (sema_co2 == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for CO2-Measurement");
+        return;
+    }
+
+    if (sema_ethanol == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for ethanol-Measurement");
+        return;
+    }
+
+    if (sema_temperature == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for temperature-Measurement");
+        return;
+    }
+
+    if (sema_database == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for database entry");
+        return;
+    }
+    */
 
     // Binary semaphore starts empty, must give it once to make it available
     xSemaphoreGive(sema_measurement);
@@ -82,6 +136,30 @@ void app_main(void)
 
     if (wifi_connect_status)
     {
+        initialize_sntp();
+
+        // Erfasse aktuelle Zeit
+        time_t now;
+        struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        // Erstelle Messungs-ID: JJMMTT_HHMM
+        strftime(measurement_id, sizeof(measurement_id), "%y%m%d_%H%M", &timeinfo);
+
+        // Uhrzeit: HH:MM
+        strftime(measurement_start_time, sizeof(measurement_start_time), "%H:%M", &timeinfo);
+
+        // Datum: DD.MM.JJJJ
+        strftime(measurement_start_date, sizeof(measurement_start_date), "%d.%m.%Y", &timeinfo);
+
+        ESP_LOGI("TIME", "Messung gestartet: %s um %s am %s",
+                 measurement_id, measurement_start_time, measurement_start_date);
+
+        // Erzeuge den Messungsname String
+        strcpy(messungsname, measurement_id);
+        strcat(messungsname, "_breadbuddy_prototyp");
+        ESP_LOGE("MAIN", "Messungsname: %s", messungsname);
     }
 
     // initialisierung des ADC
@@ -123,4 +201,5 @@ void app_main(void)
     // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
     // xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
     // xTaskCreate(database_task, "database", 8192, NULL, 5, NULL);
+    xTaskCreate(webserver_task, "webserver", 28672, NULL, 5, NULL);
 }
