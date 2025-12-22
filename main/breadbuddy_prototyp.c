@@ -56,7 +56,9 @@ char notizen[1024];
 // webserver
 #include "webserver.h"
 char bake_rest_time[64] = "---";
+uint32_t time_remain = 0;
 char bake_time[64] = "---";
+uint32_t time_ready = 0;
 char last_bake_time[64] = "---";
 bool baking = false;
 
@@ -65,6 +67,10 @@ bool baking = false;
 char measurement_id[64] = "---";
 char measurement_start_time[64] = "---";
 char measurement_start_date[64] = "---";
+// TODO: Beendung der Messung müssen diese Werte befüllen!!
+char measurement_stop_time[64] = "---";
+char measurement_stop_date[64] = "---";
+char measurement_duration[64] = "---";
 
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
@@ -148,6 +154,7 @@ void app_main(void)
     {
         initialize_sntp();
 
+        // TODO: das sollte eigentlich erst beim Messungsstart durchgeführt werden!!!
         // Erfasse aktuelle Zeit
         time_t now;
         struct tm timeinfo;

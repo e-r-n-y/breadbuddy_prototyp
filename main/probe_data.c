@@ -82,7 +82,12 @@ char *probe_data_to_json(const probe_data_t *data)
     cJSON_AddNumberToObject(probe, "temperatur_c", data->probe.temperatur_c);
     cJSON_AddItemToObject(root, "probe", probe);
 
-    char *json_string = cJSON_Print(root);
+    // Variante mit Einrückungen
+    // char *json_string = cJSON_Print(root);
+
+    // Variante mit möglichst kompakter Darstellung
+    char *json_string = cJSON_PrintUnformatted(root);
+
     cJSON_Delete(root);
     return json_string;
 }
