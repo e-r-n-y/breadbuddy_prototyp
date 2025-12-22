@@ -55,6 +55,10 @@ char notizen[1024];
 
 // webserver
 #include "webserver.h"
+char bake_rest_time[64] = "---";
+char bake_time[64] = "---";
+char last_bake_time[64] = "---";
+bool baking = false;
 
 // timeserver
 #include "current_time.h"
@@ -126,7 +130,7 @@ void app_main(void)
     */
 
     // Binary semaphore starts empty, must give it once to make it available
-    xSemaphoreGive(sema_measurement);
+    // xSemaphoreGive(sema_measurement);
 
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();
@@ -176,6 +180,7 @@ void app_main(void)
 
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
 
+    /*
     // *** I2C BUS RESET - 9 CLOCK PULSES ***
     ESP_LOGI("MAIN", "Resetting I2C bus with 9 clock pulses...");
 
@@ -184,18 +189,19 @@ void app_main(void)
         .mode = GPIO_MODE_OUTPUT,
         .pin_bit_mask = (1ULL << I2C_MASTER_SCL),
         .pull_up_en = GPIO_PULLUP_ENABLE};
-    gpio_config(&io_conf);
+        gpio_config(&io_conf);
 
-    for (int i = 0; i < 9; i++)
-    {
-        gpio_set_level(I2C_MASTER_SCL, 0);
-        esp_rom_delay_us(10);
-        gpio_set_level(I2C_MASTER_SCL, 1);
-        esp_rom_delay_us(10);
-    }
+        for (int i = 0; i < 9; i++)
+        {
+            gpio_set_level(I2C_MASTER_SCL, 0);
+            esp_rom_delay_us(10);
+            gpio_set_level(I2C_MASTER_SCL, 1);
+            esp_rom_delay_us(10);
+        }
 
-    ESP_LOGI("MAIN", "I2C bus reset completed, SDA level: %d", gpio_get_level(I2C_MASTER_SDA));
-    vTaskDelay(pdMS_TO_TICKS(100));
+        ESP_LOGI("MAIN", "I2C bus reset completed, SDA level: %d", gpio_get_level(I2C_MASTER_SDA));
+        vTaskDelay(pdMS_TO_TICKS(100));
+    */
 
     // *** ZENTRALE I2C-INITIALISIERUNG ***
     ESP_LOGI("MAIN", "Initializing I2C bus...");

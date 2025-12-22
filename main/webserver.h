@@ -52,6 +52,7 @@ size_t readValue(char *buf, char *key, char *output, size_t output_size);
 esp_err_t post_req_handler(httpd_req_t *req);
 esp_err_t style_handler(httpd_req_t *req);
 esp_err_t phwert_handler(httpd_req_t *req);
+void url_decode(char *dst, const char *src);
 httpd_handle_t setup_server(void);
 void webserver_task(void *pvParameter);
 
@@ -62,9 +63,13 @@ extern httpd_uri_t uri_style;
 
 extern probe_data_t probendaten;
 extern char notizen[1024];
+extern bool baking;
 extern char measurement_id[64];
 extern char measurement_start_time[64];
 extern char measurement_start_date[64];
+extern char bake_rest_time[64];
+extern char bake_time[64];
+extern char last_bake_time[64];
 extern uint32_t resistance;
 extern uint32_t co2_ppm;
 extern uint32_t adc_eth_ppm;
@@ -74,3 +79,5 @@ extern float humidity;
 extern float ph_value;
 extern float last_ph_value;
 extern char last_ph_time[64];
+
+extern SemaphoreHandle_t sema_measurement;

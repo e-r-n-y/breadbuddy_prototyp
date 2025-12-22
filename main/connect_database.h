@@ -19,14 +19,21 @@
 // Allgemeines
 extern SemaphoreHandle_t sema_measurement;
 extern const int messungsDelay;
+
 extern char messungsname[64];
+extern float temp_obj;
+extern float temp_amb;
+extern float temp_amb_co2;
+extern float humidity;
 extern uint32_t resistance;
 extern uint32_t co2_ppm;
 extern uint32_t adc_eth_ppm;
-extern float temp_obj;
-extern float temp_amb;
-extern float humidity;
-extern float temp_amb_co2;
+extern ph_value;
+extern time_remain;
+extern time_ready;
+extern bool baking;
+extern probe_data_t probendaten;
+extern char notizen[1024];
 
 // Funktionen
 void database_task(void *pvParameters);

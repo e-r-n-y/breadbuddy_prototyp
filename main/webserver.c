@@ -129,6 +129,30 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
         strcpy(response_buffer, temp);
     }
 
+    // Ersetze {{REST_TIME}}
+    pos = strstr(response_buffer, "{{REST_TIME}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 bake_rest_time,
+                 pos + strlen("{{REST_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{BAKE_TIME}}
+    pos = strstr(response_buffer, "{{BAKE_TIME}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 bake_time,
+                 pos + strlen("{{BAKE_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
     // Ersetze {{START_DATE}}
     pos = strstr(response_buffer, "{{START_DATE}}");
     if (pos)
@@ -251,6 +275,18 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
         strcpy(response_buffer, temp);
     }
 
+    // Ersetze {{LAST_BAKE_TIME}}
+    pos = strstr(response_buffer, "{{LAST_BAKE_TIME}}");
+    if (pos)
+    {
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 last_bake_time,
+                 pos + strlen("{{LAST_BAKE_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
     // Sende Response
     int result = httpd_resp_send(req, response_buffer, HTTPD_RESP_USE_STRLEN);
 
@@ -296,9 +332,16 @@ size_t readValue(char *buf, char *key, char *output, size_t output_size)
         pos += strlen(keyname);
         char *end = strpbrk(pos, "&\r\n");
         size_t len = end ? (size_t)(end - pos) : strlen(pos);
-        len = MIN(len, output_size - 1);
-        strncpy(output, pos, len);
-        output[len] = '\0';
+
+        // Temporärer Buffer für URL-encoded Wert
+        char temp[256];
+        len = MIN(len, sizeof(temp) - 1);
+        strncpy(temp, pos, len);
+        temp[len] = '\0';
+
+        // URL-Dekodierung durchführen
+        url_decode(output, temp);
+
         ESP_LOGI(WEB_TAG, "Value of %s: %s -- WebState: %d", key, output, web_state);
     }
     return 0;
@@ -351,6 +394,9 @@ esp_err_t post_req_handler(httpd_req_t *req)
             readValue(buf, "probe_temperatur", buffer, 64);
             probendaten.probe.temperatur_c = atof(buffer);
 
+            // um Messung auch tatsächlich zu starten
+            xSemaphoreGive(sema_measurement);
+
             web_state = 1;
         }
         else if (strcmp(action_value, "end") == 0)
@@ -359,6 +405,18 @@ esp_err_t post_req_handler(httpd_req_t *req)
         }
         else if (strcmp(action_value, "finally") == 0)
         {
+
+            xSemaphoreTake(sema_measurement, portMAX_DELAY);
+            // Notizen speichern
+            readValue(buf, "notes", notizen, sizeof(notizen));
+            ESP_LOGI(WEB_TAG, "Notizen: %s", notizen);
+            // TODO:
+            // Endzeit notieren
+            // Gesamtdauer der Messung berechnen
+
+            // kein SemaphoreGive weil die Messung ja dann beendet werden soll
+            // FIXME: hier muss nochmal die Datenbank angesprochen werden bevor alle Aktivität eingestellt werden kann!!!
+
             web_state = 3;
         }
         else if (strcmp(action_value, "back") == 0 && web_state > 0)
@@ -371,9 +429,12 @@ esp_err_t post_req_handler(httpd_req_t *req)
         }
         else if (strcmp(action_value, "log_ph") == 0)
         {
+            xSemaphoreTake(sema_measurement, portMAX_DELAY);
             // PH-Werte einmelden
             readValue(buf, "ph_wert", buffer, 64);
             ph_value = atof(buffer);
+
+            xSemaphoreGive(sema_measurement);
 
             // Aktuelle Zeit für PH-Wert speichern
             time_t now;
@@ -386,6 +447,25 @@ esp_err_t post_req_handler(httpd_req_t *req)
 
             web_state = 1;
         }
+        else if (strcmp(action_value, "baketime") == 0)
+        {
+            xSemaphoreTake(sema_measurement, portMAX_DELAY);
+
+            // Aktuelle Zeit für Backzeit speichern
+            time_t now;
+            struct tm timeinfo;
+            time(&now);
+            localtime_r(&now, &timeinfo);
+            strftime(last_bake_time, sizeof(last_bake_time), "%H:%M", &timeinfo);
+
+            ESP_LOGI(WEB_TAG, "Backzeitpunkt gespeichert: um %s", last_bake_time);
+
+            baking = true;
+
+            xSemaphoreGive(sema_measurement);
+
+            web_state = 1;
+        }
         else
         {
             web_state = 0;
@@ -394,7 +474,14 @@ esp_err_t post_req_handler(httpd_req_t *req)
 
     ESP_LOGW("STATE", "Webstate: %d", web_state);
 
-    return get_req_handler(req);
+    // return get_req_handler(req);
+
+    // Sende 303 See Other Redirect statt direkt die Seite
+    httpd_resp_set_status(req, "303 See Other");
+    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_send(req, NULL, 0);
+
+    return ESP_OK;
 }
 
 esp_err_t style_handler(httpd_req_t *req)
@@ -429,6 +516,44 @@ esp_err_t phwert_handler(httpd_req_t *req)
 {
     // TODO:
     return send_web_page(req, style_css);
+}
+
+// URL-Dekodierung (ersetzt + durch Leerzeichen und %XX durch entsprechende Zeichen)
+void url_decode(char *dst, const char *src)
+{
+    char a, b;
+    while (*src)
+    {
+        if ((*src == '%') &&
+            ((a = src[1]) && (b = src[2])) &&
+            (isxdigit(a) && isxdigit(b)))
+        {
+            if (a >= 'a')
+                a -= 'a' - 'A';
+            if (a >= 'A')
+                a -= ('A' - 10);
+            else
+                a -= '0';
+            if (b >= 'a')
+                b -= 'a' - 'A';
+            if (b >= 'A')
+                b -= ('A' - 10);
+            else
+                b -= '0';
+            *dst++ = 16 * a + b;
+            src += 3;
+        }
+        else if (*src == '+')
+        {
+            *dst++ = ' ';
+            src++;
+        }
+        else
+        {
+            *dst++ = *src++;
+        }
+    }
+    *dst++ = '\0';
 }
 
 httpd_handle_t setup_server(void)
