@@ -13,7 +13,6 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-
 static int s_retry_num = 0;
 int wifi_connect_status = 0;
 
@@ -88,6 +87,19 @@ void connect_wifi(void)
     };
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+
+    // FIXME: dieser Teil wurde eingefügt für statische IP-Adresse
+    // Statische IP konfigurieren (VOR esp_wifi_start())
+    esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
+    esp_netif_dhcpc_stop(netif);
+
+    esp_netif_ip_info_t ip_info;
+    IP4_ADDR(&ip_info.ip, 10, 0, 10, 246);        // Deine IP
+    IP4_ADDR(&ip_info.gw, 10, 0, 10, 1);          // Gateway (Router)
+    IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0); // Netzmaske
+    esp_netif_set_ip_info(netif, &ip_info);
+    // FIXME: Ende
+
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(TAG, "wifi_init_sta finished.");
