@@ -1,0 +1,35 @@
+{
+    "measurement": "251223_2112_breadbuddy_prototyp",
+    "temp_obj": 0.00,
+    "temp_amb": 0.00,
+    "humidity": 0.00,
+    "resistance": 1103,
+    "co2": 0,
+    "ethanol": 0,
+    "ph": 5.80,
+    "time_remain": 0,
+    "time_ready": 0,
+    "baking": true,
+    "sample_info": {
+        "starter": {
+            "menge_g": 123,
+            "temperatur_c": 23.100000381469727
+        },
+        "wasser": {
+            "menge_g": 234,
+            "temperatur_c": 24.100000381469727
+        },
+        "mehl": {
+            "menge_g": 345,
+            "temperatur_c": 25.100000381469727
+        },
+        "salz": {
+            "menge_g": 123
+        },
+        "probe": {
+            "menge_g": 123,
+            "temperatur_c": 25.899999618530273
+        }
+    },
+    "notes": "Maa bitte geh!"
+}

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zusammenfassung</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
 <body>
@@ -13,24 +14,24 @@
     <div class="container">
         <h1>Zusammenfassung</h1>
         <p style="text-align: center; font-size: 1.2rem; color: #6c757d; margin-top: -1rem; margin-bottom: 2rem;">
-            Messung <b>251007_1658</b></p>
+            Messung <b>{{MEASUREMENT_ID}}</b></p>
 
         <div class="info-grid">
             <div class="info-item">
                 <span class="label">Gestartet</span>
-                <p>07.10.2025, 16:58</p>
+                <p>{{START_DATE}}, {{START_TIME}}</p>
             </div>
             <div class="info-item">
                 <span class="label">Beendet</span>
-                <p>07.10.2025, 21:58</p>
+                <p>{{STOP_DATE}}, {{STOP_TIME}}</p>
             </div>
             <div class="info-item">
                 <span class="label">Gesamtdauer</span>
-                <p>5h 00min</p>
+                <p>{{DURATION}}</p>
             </div>
             <div class="info-item">
                 <span class="label">Teigtemperatur Start</span>
-                <p>25.5 °C</p>
+                <p>{{PROBE_TEMP}} °C</p>
             </div>
         </div>
 
@@ -45,33 +46,33 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Weizenmehl</td>
-                    <td>500 g</td>
+                    <td>Mehl</td>
+                    <td><span id="mehl">{{MEHL_MENGE}}</span> g</td>
                     <td>100 %</td>
                 </tr>
                 <tr>
                     <td>Wasser</td>
-                    <td>375 g</td>
-                    <td>75 %</td>
+                    <td><span id="wasser">{{WASSER_MENGE}}</span> g</td>
+                    <td><span id="wasser_anteil">---</span> %</td>
                 </tr>
                 <tr>
                     <td>Starter</td>
-                    <td>100 g</td>
-                    <td>20 %</td>
+                    <td><span id="starter">{{STARTER_MENGE}}</span> g</td>
+                    <td><span id="starter_anteil">---</span> %</td>
                 </tr>
                 <tr>
                     <td>Salz</td>
-                    <td>10 g</td>
-                    <td>2 %</td>
+                    <td><span id="salz">{{SALZ_MENGE}}</span> g</td>
+                    <td><span id="salz_anteil">---</span> %</td>
                 </tr>
                 <tr style="font-weight: bold;">
                     <td>Gesamtteig</td>
-                    <td>985 g</td>
+                    <td><span id="gesamt">---</span> g</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>Probenmenge</td>
-                    <td>150 g</td>
+                    <td>{{PROBE_MENGE}} g</td>
                     <td></td>
                 </tr>
             </tbody>
@@ -85,30 +86,74 @@
                     <th>PH-Wert</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="ph_table_body">
                 <tr>
-                    <td>17:30</td>
-                    <td>4,85</td>
-                </tr>
-                <tr>
-                    <td>19:00</td>
-                    <td>4,60</td>
-                </tr>
-                <tr>
-                    <td>21:30</td>
-                    <td>4,35</td>
+                    <td colspan="2" style="text-align: center; color: #6c757d;">Keine PH-Werte erfasst</td>
                 </tr>
             </tbody>
         </table>
 
         <h2>Notizen</h2>
-        <p class="notes">Teig war sehr klebrig, Raumtemperatur war höher als sonst. Die erste Dehnung und Faltung wurde
-            nach 45 Minuten statt nach 30 Minuten durchgeführt.</p>
+        <p class="notes">{{NOTIZEN}}</p>
 
         <form action="/" method="post" style="text-align: center; margin-top: 2rem;">
             <button class="button" type="submit" name="action" value="new">Neue Messung starten</button>
         </form>
     </div>
+
+    <!-- PH-Daten als JSON -->
+    <script id="ph_data" type="application/json">
+        {{PH_DATA_JSON}}
+    </script>
+
+    <script>
+        // Berechne Anteile basierend auf Mehlmenge (100%) und Gesamtmenge
+        window.addEventListener('DOMContentLoaded', function () {
+            const mehl = parseFloat(document.getElementById('mehl').textContent);
+            const wasser = parseFloat(document.getElementById('wasser').textContent);
+            const starter = parseFloat(document.getElementById('starter').textContent);
+            const salz = parseFloat(document.getElementById('salz').textContent);
+
+            if (mehl > 0) {
+                // Berechne Anteile
+                const wasserAnteil = (wasser / mehl * 100).toFixed(1);
+                const starterAnteil = (starter / mehl * 100).toFixed(1);
+                const salzAnteil = (salz / mehl * 100).toFixed(1);
+
+                document.getElementById('wasser_anteil').textContent = wasserAnteil;
+                document.getElementById('starter_anteil').textContent = starterAnteil;
+                document.getElementById('salz_anteil').textContent = salzAnteil;
+
+                // Berechne Gesamtmenge
+                const gesamtMenge = (mehl + wasser + starter + salz).toFixed(1);
+                document.getElementById('gesamt').textContent = gesamtMenge;
+            }
+
+            // PH-Wert Tabelle füllen
+            try {
+                const phDataElement = document.getElementById('ph_data');
+                const phData = JSON.parse(phDataElement.textContent);
+                const tbody = document.getElementById('ph_table_body');
+
+                if (phData && phData.length > 0) {
+                    // Leere die Tabelle
+                    tbody.innerHTML = '';
+
+                    // Füge jede PH-Messung hinzu
+                    phData.forEach(function (entry) {
+                        const row = tbody.insertRow();
+                        const cellTime = row.insertCell(0);
+                        const cellValue = row.insertCell(1);
+
+                        cellTime.textContent = entry.time;
+                        cellValue.textContent = entry.value.toFixed(2);
+                    });
+                }
+            } catch (e) {
+                console.error('Fehler beim Laden der PH-Daten:', e);
+            }
+        });
+    </script>
 
 </body>
 

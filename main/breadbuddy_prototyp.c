@@ -46,6 +46,8 @@ float temp_amb = 0.0;
 
 // für PH-Werte
 float ph_value = 0.0;
+float last_ph_value = 0.0;
+ph_t ph_array[32] = {0};
 
 // datenbank verbindung
 #include "connect_database.h"
@@ -71,6 +73,9 @@ char measurement_start_date[64] = "---";
 char measurement_stop_time[64] = "---";
 char measurement_stop_date[64] = "---";
 char measurement_duration[64] = "---";
+time_t start_time;
+time_t stop_time;
+time_t duration;
 
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
@@ -85,7 +90,7 @@ SemaphoreHandle_t sema_database = NULL;
 // Settings für Messung
 // char *messungsname = "251220_TEST_breadbuddy_prototyp";
 char messungsname[64];
-const int messungsDelay = 5000; // 15 * 60 * 1000 = 900.000
+const int messungsDelay = 30000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
 {
@@ -153,30 +158,6 @@ void app_main(void)
     if (wifi_connect_status)
     {
         initialize_sntp();
-
-        // TODO: das sollte eigentlich erst beim Messungsstart durchgeführt werden!!!
-        // Erfasse aktuelle Zeit
-        time_t now;
-        struct tm timeinfo;
-        time(&now);
-        localtime_r(&now, &timeinfo);
-
-        // Erstelle Messungs-ID: JJMMTT_HHMM
-        strftime(measurement_id, sizeof(measurement_id), "%y%m%d_%H%M", &timeinfo);
-
-        // Uhrzeit: HH:MM
-        strftime(measurement_start_time, sizeof(measurement_start_time), "%H:%M", &timeinfo);
-
-        // Datum: DD.MM.JJJJ
-        strftime(measurement_start_date, sizeof(measurement_start_date), "%d.%m.%Y", &timeinfo);
-
-        ESP_LOGI("TIME", "Messung gestartet: %s um %s am %s",
-                 measurement_id, measurement_start_time, measurement_start_date);
-
-        // Erzeuge den Messungsname String
-        strcpy(messungsname, measurement_id);
-        strcat(messungsname, "_breadbuddy_prototyp");
-        ESP_LOGE("MAIN", "Messungsname: %s", messungsname);
     }
 
     // initialisierung des ADC
@@ -216,9 +197,9 @@ void app_main(void)
     ESP_LOGI("MAIN", "i2cdev library initialized");
 
     xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
-    // xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
-    // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
+    xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
+    xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
     // xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
-    // xTaskCreate(database_task, "database", 8192, NULL, 5, NULL);
+    xTaskCreate(database_task, "database", 24576, NULL, 5, NULL);
     xTaskCreate(webserver_task, "webserver", 28672, NULL, 5, NULL);
 }
