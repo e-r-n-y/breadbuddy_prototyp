@@ -218,7 +218,7 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
 
     // Ersetze {{TEMP_AMB}}
     char temp_amb_str[32];
-    snprintf(temp_amb_str, sizeof(temp_amb_str), "%.1f", temp_amb);
+    snprintf(temp_amb_str, sizeof(temp_amb_str), "%.1f", temp_amb_co2);
     pos = strstr(response_buffer, "{{TEMP_AMB}}");
     if (pos)
     {
@@ -460,6 +460,32 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
                  (int)before_len, response_buffer,
                  ph_json,
                  pos + strlen("{{PH_DATA_JSON}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{ELAPSED_TIME}}
+    pos = strstr(response_buffer, "{{ELAPSED_TIME}}");
+    if (pos)
+    {
+
+        // Berechne vergangene Zeit wenn Messung läuft
+        if (start_time > 0)
+        {
+            time_t current_time;
+            time(&current_time);
+            time_t elapsed_seconds = current_time - start_time;
+
+            int hours = elapsed_seconds / 3600;
+            int minutes = (elapsed_seconds % 3600) / 60;
+
+            snprintf(elapsed_time_str, sizeof(elapsed_time_str), "%dh %02dmin", hours, minutes);
+        }
+
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 elapsed_time_str,
+                 pos + strlen("{{ELAPSED_TIME}}"));
         strcpy(response_buffer, temp);
     }
 
@@ -869,7 +895,7 @@ void url_decode(char *dst, const char *src)
 httpd_handle_t setup_server(void)
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.stack_size = 8192;
+    config.stack_size = 12288;
     httpd_handle_t server = NULL;
 
     if (httpd_start(&server, &config) == ESP_OK)
@@ -877,7 +903,7 @@ httpd_handle_t setup_server(void)
         httpd_register_uri_handler(server, &uri_get);
         httpd_register_uri_handler(server, &uri_post);
         httpd_register_uri_handler(server, &uri_style);
-        httpd_register_uri_handler(server, &uri_favicon); // NEU
+        httpd_register_uri_handler(server, &uri_favicon);
     }
 
     return server;

@@ -4,93 +4,86 @@ static const char *TAG = "breadbuddy_http_post";
 
 void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float humidity, uint32_t widerstand_ohm, uint32_t co2_ppm, uint32_t ethanol_ppm, float ph_value, uint32_t time_remain, uint32_t time_ready, bool baking, probe_data_t *probendaten, char *notizen)
 {
-    char json_data[6144];
-    strcpy(json_data, "{\"measurement\": \"");
-    strcat(json_data, messungsname);
+    // Erstelle JSON-Objekt
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to create JSON object");
+        return;
+    }
 
-    strcat(json_data, "\",\"temp_obj\": ");
-    char temp_obj_str[20];
-    sprintf(temp_obj_str, "%.2f", temp_obj);
-    strcat(json_data, temp_obj_str);
+    // Füge alle Felder hinzu
+    cJSON_AddStringToObject(root, "measurement", messungsname);
+    cJSON_AddNumberToObject(root, "temp_obj", temp_obj);
+    cJSON_AddNumberToObject(root, "temp_amb", temp_amb);
+    cJSON_AddNumberToObject(root, "humidity", humidity);
+    cJSON_AddNumberToObject(root, "resistance", widerstand_ohm);
+    cJSON_AddNumberToObject(root, "co2", co2_ppm);
+    cJSON_AddNumberToObject(root, "ethanol", ethanol_ppm);
+    cJSON_AddNumberToObject(root, "ph", ph_value);
+    cJSON_AddNumberToObject(root, "time_remain", time_remain);
+    cJSON_AddBoolToObject(root, "baking", baking);
+    cJSON_AddStringToObject(root, "notes", notizen);
 
-    strcat(json_data, ",\"temp_amb\": ");
-    char temp_amb_str[20];
-    sprintf(temp_amb_str, "%.2f", temp_amb);
-    strcat(json_data, temp_amb_str);
+    // Probe-Daten als Sub-Objekt
+    cJSON *probe = cJSON_CreateObject();
+    cJSON *starter = cJSON_CreateObject();
+    cJSON_AddNumberToObject(starter, "menge_g", probendaten->starter.menge_g);
+    cJSON_AddNumberToObject(starter, "temperatur_c", probendaten->starter.temperatur_c);
+    cJSON_AddItemToObject(probe, "starter", starter);
 
-    strcat(json_data, ",\"humidity\": ");
-    char humidity_str[20];
-    sprintf(humidity_str, "%.2f", humidity);
-    strcat(json_data, humidity_str);
+    cJSON *wasser = cJSON_CreateObject();
+    cJSON_AddNumberToObject(wasser, "menge_ml", probendaten->wasser.menge_g);
+    cJSON_AddNumberToObject(wasser, "temperatur_c", probendaten->wasser.temperatur_c);
+    cJSON_AddItemToObject(probe, "wasser", wasser);
 
-    strcat(json_data, ",\"resistance\": ");
-    char resistance_str[20];
-    sprintf(resistance_str, "%lu", widerstand_ohm);
-    strcat(json_data, resistance_str);
+    cJSON *mehl = cJSON_CreateObject();
+    cJSON_AddNumberToObject(mehl, "menge_g", probendaten->mehl.menge_g);
+    cJSON_AddNumberToObject(mehl, "temperatur_c", probendaten->mehl.temperatur_c);
+    cJSON_AddItemToObject(probe, "mehl", mehl);
 
-    strcat(json_data, ",\"co2\": ");
-    char co2_str[20];
-    sprintf(co2_str, "%lu", co2_ppm);
-    strcat(json_data, co2_str);
+    cJSON *salz = cJSON_CreateObject();
+    cJSON_AddNumberToObject(salz, "menge_g", probendaten->salz.menge_g);
+    cJSON_AddItemToObject(probe, "salz", salz);
 
-    strcat(json_data, ",\"ethanol\": ");
-    char ethanol_str[20];
-    sprintf(ethanol_str, "%lu", ethanol_ppm);
-    strcat(json_data, ethanol_str);
+    cJSON *probe_obj = cJSON_CreateObject();
+    cJSON_AddNumberToObject(probe_obj, "menge_g", probendaten->probe.menge_g);
+    cJSON_AddNumberToObject(probe_obj, "temperatur_c", probendaten->probe.temperatur_c);
+    cJSON_AddItemToObject(probe, "probe", probe_obj);
 
-    strcat(json_data, ",\"ph\": ");
-    char ph_str[20];
-    sprintf(ph_str, "%.2f", ph_value);
-    strcat(json_data, ph_str);
+    // Probendaten in JSON Objekt einbauen
+    cJSON_AddItemToObject(root, "sample_info", probe);
 
-    strcat(json_data, ",\"time_remain\": ");
-    char time_remain_str[20];
-    sprintf(time_remain_str, "%lu", time_remain);
-    strcat(json_data, time_remain_str);
+    // JSON zu String konvertieren
+    char *json_string = cJSON_PrintUnformatted(root);
+    if (json_string == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to print JSON");
+        cJSON_Delete(root);
+        return;
+    }
 
-    /*
-    strcat(json_data, ",\"time_ready\": ");
-    char time_ready_str[20];
-    sprintf(time_ready_str, "%lu", time_ready);
-    strcat(json_data, time_ready_str);
-    */
+    ESP_LOGI(TAG, "JSON: %s\n", json_string);
 
-    strcat(json_data, ",\"baking\": ");
-    char baking_str[20];
-    // TODO: prüfen ob das auch so funktioniert mit dem Boolean wert im json
-    sprintf(baking_str, "%s", baking ? "true" : "false");
-    strcat(json_data, baking_str);
+    // HTTP-Request erstellen
+    int content_length = strlen(json_string);
+    char *http_request = malloc(content_length + 256);
+    if (http_request == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to allocate http_request");
+        cJSON_free(json_string);
+        cJSON_Delete(root);
+        return;
+    }
 
-    strcat(json_data, ",\"sample_info\": ");
-    char sample_info_str[4096];
-    // TODO: prüfen!!!
-    sprintf(sample_info_str, "%s", probe_data_to_json(probendaten));
-    strcat(json_data, sample_info_str);
-
-    strcat(json_data, ",\"notes\": ");
-    char notes_str[1024];
-    // TODO: prüfen!!!
-    sprintf(notes_str, "\"%s\"", notizen);
-    strcat(json_data, notes_str);
-
-    strcat(json_data, "}");
-
-    // TODO: Ausgabe des Json um es zu kontrollieren - DEBUGGING
-    printf("%s\n", json_data);
-
-    int content_length = strlen(json_data);
-
-    char http_request[6500];
     sprintf(http_request,
             "POST %s HTTP/1.0\r\n"
             "Host: %s:%s\r\n"
-            //"User-Agent: esp-idf/1.0 esp32\r\n" // braucht man nur wenn der Server das verlangt
             "Content-Type: application/json\r\n"
-            "Content-Length: %d\r\n" // das ist unerlässlich
-            //"Prefer: return=representation\r\n" // optional wenn man nochmal die Daten zurückhaben will
+            "Content-Length: %d\r\n"
             "\r\n"
             "%s",
-            WEB_PATH, WEB_SERVER, WEB_PORT, content_length, json_data);
+            WEB_PATH, WEB_SERVER, WEB_PORT, content_length, json_string);
 
     const struct addrinfo hints = {
         .ai_family = AF_INET,
@@ -106,6 +99,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     if (err != 0 || res == NULL)
     {
         ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
+        // CLEANUP!
+        free(http_request);
+        cJSON_free(json_string);
+        cJSON_Delete(root);
         vTaskDelay(pdMS_TO_TICKS(1000));
         return;
     }
@@ -121,6 +118,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... Failed to allocate socket.");
         freeaddrinfo(res);
+        // CLEANUP!
+        free(http_request);
+        cJSON_free(json_string);
+        cJSON_Delete(root);
         vTaskDelay(pdMS_TO_TICKS(1000));
         return;
     }
@@ -131,6 +132,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
         ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
         close(s);
         freeaddrinfo(res);
+        // CLEANUP!
+        free(http_request);
+        cJSON_free(json_string);
+        cJSON_Delete(root);
         vTaskDelay(pdMS_TO_TICKS(4000));
         return;
     }
@@ -142,6 +147,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... socket send failed");
         close(s);
+        // CLEANUP!
+        free(http_request);
+        cJSON_free(json_string);
+        cJSON_Delete(root);
         vTaskDelay(pdMS_TO_TICKS(4000));
         return;
     }
@@ -155,6 +164,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... failed to set socket receiving timeout");
         close(s);
+        // CLEANUP!
+        free(http_request);
+        cJSON_free(json_string);
+        cJSON_Delete(root);
         vTaskDelay(pdMS_TO_TICKS(4000));
         return;
     }
@@ -173,4 +186,9 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
 
     ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d.", r, errno);
     close(s);
+
+    // Final Cleanup
+    free(http_request);
+    cJSON_free(json_string);
+    cJSON_Delete(root);
 }

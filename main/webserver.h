@@ -73,6 +73,7 @@ extern char measurement_start_date[64];
 extern char measurement_stop_time[64];
 extern char measurement_stop_date[64];
 extern char measurement_duration[64];
+extern char elapsed_time_str[32];
 extern char bake_rest_time[64];
 extern char bake_time[64];
 extern char last_bake_time[64];

@@ -90,6 +90,7 @@ void connect_wifi(void)
 
     // FIXME: dieser Teil wurde eingefügt für statische IP-Adresse
     // Statische IP konfigurieren (VOR esp_wifi_start())
+    /*
     esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
     esp_netif_dhcpc_stop(netif);
 
@@ -98,6 +99,7 @@ void connect_wifi(void)
     IP4_ADDR(&ip_info.gw, 10, 0, 10, 1);          // Gateway (Router)
     IP4_ADDR(&ip_info.netmask, 255, 255, 255, 0); // Netzmaske
     esp_netif_set_ip_info(netif, &ip_info);
+    */
     // FIXME: Ende
 
     ESP_ERROR_CHECK(esp_wifi_start());

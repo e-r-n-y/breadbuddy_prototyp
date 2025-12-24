@@ -19,12 +19,16 @@
 
     <div class="container">
         <div>
-            <span class="info-label">MessungsNr.</span>
+            <span class="info-label">MessungsNr.:</span>
             <p style="margin: 0;"><b>{{MEASUREMENT_ID}}</b></p>
         </div>
         <div>
-            <span class="info-label">Gestartet</span>
+            <span class="info-label">Gestartet:</span>
             <p style="margin: 0;"><b>{{START_TIME}} am {{START_DATE}}</b></p>
+        </div>
+        <div>
+            <span class="info-label">Vergangene Zeit:</span>
+            <p style="margin: 0;"><b>{{ELAPSED_TIME}}</b></p>
         </div>
 
         <div class="status-display">
@@ -50,12 +54,12 @@
                     <td><b>{{ETHANOL}} ppm</b></td>
                 </tr>
                 <tr>
-                    <td><span class="info-label">Lufttemperatur:</span></td>
-                    <td><b>{{TEMP_AMB}} °C</b></td>
-                </tr>
-                <tr>
                     <td><span class="info-label">Objekttemperatur:</span></td>
                     <td><b>{{TEMP_OBJ}} °C</b></td>
+                </tr>
+                <tr>
+                    <td><span class="info-label">Lufttemperatur:</span></td>
+                    <td><b>{{TEMP_AMB}} °C</b></td>
                 </tr>
                 <tr>
                     <td><span class="info-label">Luftfeuchtigkeit:</span></td>
