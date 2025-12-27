@@ -19,6 +19,8 @@
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 
+#include "time.h"
+
 // Allgemeines
 #include <driver/gpio.h>
 extern const char *TAG_RES;
@@ -37,6 +39,13 @@ extern const int messungsDelay;
 extern int adc_res_raw;
 extern int adc_res_voltage;
 extern uint32_t resistance;
+extern uint32_t last_resistance;
+extern time_t knickpunkt; // besseren Name finden
+extern bool knickpunkt_erreicht;
+extern uint32_t time_remain;
+extern uint32_t time_ready;
+extern time_t duration;
+extern time_t start_time;
 
 // Funktionen
 bool adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);

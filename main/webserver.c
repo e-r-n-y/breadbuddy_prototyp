@@ -670,8 +670,8 @@ esp_err_t post_req_handler(httpd_req_t *req)
             ESP_LOGI("TIME", "Messungsdauer: %s", measurement_duration);
 
             // kein SemaphoreGive weil die Messung ja dann beendet werden soll
-            // FIXME: hier muss nochmal die Datenbank angesprochen werden bevor alle Aktivität eingestellt werden kann!!!
 
+            // hier muss nochmal die Datenbank angesprochen werden bevor alle Aktivität eingestellt werden kann!!!
             http_post_alldata(messungsname, temp_obj, temp_amb_co2, humidity, resistance, co2_ppm, adc_eth_ppm, ph_value, time_remain, time_ready, baking, &probendaten, notizen);
 
             web_state = 3;

@@ -152,7 +152,32 @@ void resistance_task(void *pvParameters)
                     ESP_LOGI(TAG_RES, "Calculated Resistance: %.2f kohms\n", r2 / 1000);
                 }
             }
+            last_resistance = resistance;
             resistance = r2;
+
+            // FIXME:
+            time_t now;
+            time(&now);
+            duration = now - start_time;
+
+            ESP_LOGW("DEBUG", "Resistance: %ld", resistance);
+            ESP_LOGW("DEBUG", "Last Resistance: %ld", last_resistance);
+            ESP_LOGW("DEBUG", "Duration: %ld", duration);
+            ESP_LOGW("DEBUG", "Knickpunkt erreicht: %s", knickpunkt_erreicht ? "true" : "false");
+
+            // FIXME: erster Versuch einer zeitbasierten Vorhersage
+            if (!knickpunkt_erreicht && resistance > (last_resistance + 50) && duration > 60) // normal 2000 ?
+            {
+                ESP_LOGW("PREDIGT", "Der Knickpunkt wurde erreicht!");
+                knickpunkt_erreicht = true;
+                time(&knickpunkt);
+                time_ready = knickpunkt + time_remain;
+            }
+
+            if (knickpunkt_erreicht)
+            {
+                time_remain = time_ready - now;
+            }
 
             ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)RES_GPIO, 0));
             xSemaphoreGive(sema_measurement);

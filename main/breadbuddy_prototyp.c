@@ -17,6 +17,9 @@
 int adc_res_raw = 0;
 int adc_res_voltage = 0;
 uint32_t resistance = 0;
+uint32_t last_resistance = 0;
+time_t knickpunkt; // besseren Name finden
+bool knickpunkt_erreicht = false;
 
 // für ethanol Messung
 #include "sensor_ethanol.h"
@@ -58,7 +61,7 @@ char notizen[1024];
 // webserver
 #include "webserver.h"
 char bake_rest_time[64] = "---";
-uint32_t time_remain = 0;
+uint32_t time_remain = 25200; // 7 Stunden ab Knickpunkt (wo Teig beginnt sich auszudehnen)
 char bake_time[64] = "---";
 uint32_t time_ready = 0;
 char last_bake_time[64] = "---";
