@@ -100,3 +100,10 @@ extern struct tm timeinfo;
 extern time_t start_time;
 extern time_t stop_time;
 extern time_t duration;
+
+extern int adc_res_raw;
+extern int adc_res_voltage;
+extern uint32_t last_resistance;
+extern bool knickpunkt_erreicht;
+extern int adc_eth_raw;
+extern float adc_eth_voltage;

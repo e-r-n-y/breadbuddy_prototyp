@@ -682,6 +682,35 @@ esp_err_t post_req_handler(httpd_req_t *req)
         }
         else if (strcmp(action_value, "new") == 0)
         {
+            // RESET / CLEAN UP
+            adc_res_raw = 0;
+            adc_res_voltage = 0;
+            resistance = 0;
+            last_resistance = 0;
+            knickpunkt_erreicht = false;
+            adc_eth_raw = 0;
+            adc_eth_voltage = 0.0;
+            adc_eth_ppm = 0;
+            co2_ppm = 0;
+            temp_amb_co2 = 0;
+            humidity = 0.0;
+            temp_obj = 0.0;
+            temp_amb = 0.0;
+            notizen[0] = '\0';
+            strcpy(bake_rest_time, "---");
+            time_remain = 25200;
+            bake_time[64] = "---";
+            time_ready = 0;
+            strcpy(last_bake_time, "---");
+            baking = false;
+            strcpy(measurement_id, "---");
+            strcpy(measurement_start_time, "---");
+            strcpy(measurement_start_date, "---");
+            strcpy(measurement_stop_time, "---");
+            strcpy(measurement_stop_date, "---");
+            strcpy(measurement_duration, "---");
+            strcpy(elapsed_time_str, "---");
+
             web_state = 0;
         }
         else if (strcmp(action_value, "log_ph") == 0)

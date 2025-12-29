@@ -33,7 +33,7 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     cJSON_AddItemToObject(probe, "starter", starter);
 
     cJSON *wasser = cJSON_CreateObject();
-    cJSON_AddNumberToObject(wasser, "menge_ml", probendaten->wasser.menge_g);
+    cJSON_AddNumberToObject(wasser, "menge_g", probendaten->wasser.menge_g);
     cJSON_AddNumberToObject(wasser, "temperatur_c", probendaten->wasser.temperatur_c);
     cJSON_AddItemToObject(probe, "wasser", wasser);
 

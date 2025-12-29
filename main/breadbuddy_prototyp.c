@@ -94,7 +94,7 @@ SemaphoreHandle_t sema_database = NULL;
 // Settings für Messung
 // char *messungsname = "251220_TEST_breadbuddy_prototyp";
 char messungsname[64];
-const int messungsDelay = 15000; // 15 * 60 * 1000 = 900.000
+const int messungsDelay = 900000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
 {
@@ -201,8 +201,8 @@ void app_main(void)
     ESP_LOGI("MAIN", "i2cdev library initialized");
 
     xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
-    // xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
-    // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
+    xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
+    xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
     // xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
     xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
     xTaskCreate(webserver_task, "webserver", 16384, NULL, 5, NULL);
