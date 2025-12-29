@@ -112,8 +112,8 @@ void co2_task(void *pvParameters)
             ESP_LOGI(TAG_CO2, "Humidity: %.2f %%\n", current_humidity);
 
             co2_ppm = co2;
-            humidity = current_humidity;
-            temp_amb_co2 = temperature;
+            humidity = (int)(current_humidity * 100) / 100.0f; // Um auf 2 Nachkommastellen zu runden
+            temp_amb_co2 = (int)(temperature * 100) / 100.0f;
             xSemaphoreGive(sema_measurement);
             vTaskDelay(pdMS_TO_TICKS(messungsDelay));
         }

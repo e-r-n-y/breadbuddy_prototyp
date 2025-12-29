@@ -682,7 +682,7 @@ esp_err_t post_req_handler(httpd_req_t *req)
         }
         else if (strcmp(action_value, "new") == 0)
         {
-            // RESET / CLEAN UP
+            // RESET and CLEAN UP
             adc_res_raw = 0;
             adc_res_voltage = 0;
             resistance = 0;

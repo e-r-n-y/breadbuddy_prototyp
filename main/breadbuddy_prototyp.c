@@ -83,16 +83,8 @@ time_t duration;
 
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
-/*
-SemaphoreHandle_t sema_resistance = NULL;
-SemaphoreHandle_t sema_co2 = NULL;
-SemaphoreHandle_t sema_ethanol = NULL;
-SemaphoreHandle_t sema_temperature = NULL;
-SemaphoreHandle_t sema_database = NULL;
-*/
 
 // Settings für Messung
-// char *messungsname = "251220_TEST_breadbuddy_prototyp";
 char messungsname[64];
 const int messungsDelay = 900000; // 15 * 60 * 1000 = 900.000
 
@@ -106,46 +98,6 @@ void app_main(void)
         ESP_LOGE("MAIN", "Failed to create semaphore for measurement");
         return;
     }
-    /*
-    sema_resistance = xSemaphoreCreateBinary();
-    sema_co2 = xSemaphoreCreateBinary();
-    sema_ethanol = xSemaphoreCreateBinary();
-    sema_temperature = xSemaphoreCreateBinary();
-    sema_database = xSemaphoreCreateBinary();
-
-    if (sema_resistance == NULL)
-    {
-        ESP_LOGE("MAIN", "Failed to create semaphore for resistance-Measurement");
-        return;
-    }
-
-    if (sema_co2 == NULL)
-    {
-        ESP_LOGE("MAIN", "Failed to create semaphore for CO2-Measurement");
-        return;
-    }
-
-    if (sema_ethanol == NULL)
-    {
-        ESP_LOGE("MAIN", "Failed to create semaphore for ethanol-Measurement");
-        return;
-    }
-
-    if (sema_temperature == NULL)
-    {
-        ESP_LOGE("MAIN", "Failed to create semaphore for temperature-Measurement");
-        return;
-    }
-
-    if (sema_database == NULL)
-    {
-        ESP_LOGE("MAIN", "Failed to create semaphore for database entry");
-        return;
-    }
-    */
-
-    // Binary semaphore starts empty, must give it once to make it available
-    // xSemaphoreGive(sema_measurement);
 
     // Initialize NVS
     esp_err_t ret = nvs_flash_init();

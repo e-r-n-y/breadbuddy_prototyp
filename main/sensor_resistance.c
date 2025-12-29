@@ -162,7 +162,7 @@ void resistance_task(void *pvParameters)
 
             ESP_LOGW("DEBUG", "Resistance: %ld", resistance);
             ESP_LOGW("DEBUG", "Last Resistance: %ld", last_resistance);
-            ESP_LOGW("DEBUG", "Duration: %ld", duration);
+            ESP_LOGW("DEBUG", "Duration: %ld", (uint32_t)duration);
             ESP_LOGW("DEBUG", "Knickpunkt erreicht: %s", knickpunkt_erreicht ? "true" : "false");
 
             // FIXME: erster Versuch einer zeitbasierten Vorhersage
