@@ -699,7 +699,7 @@ esp_err_t post_req_handler(httpd_req_t *req)
             notizen[0] = '\0';
             strcpy(bake_rest_time, "---");
             time_remain = 25200;
-            bake_time[64] = "---";
+            strcpy(bake_time, "---");
             time_ready = 0;
             strcpy(last_bake_time, "---");
             baking = false;

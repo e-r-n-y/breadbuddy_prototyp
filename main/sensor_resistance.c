@@ -156,6 +156,7 @@ void resistance_task(void *pvParameters)
             resistance = r2;
 
             // FIXME:
+            /*
             time_t now;
             time(&now);
             duration = now - start_time;
@@ -178,6 +179,7 @@ void resistance_task(void *pvParameters)
             {
                 time_remain = time_ready - now;
             }
+            */
 
             ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)RES_GPIO, 0));
             xSemaphoreGive(sema_measurement);

@@ -20,13 +20,6 @@ typedef enum
     DEGRATION
 } Phase;
 
-extern SemaphoreHandle_t sema_measurement;
-extern Dataset_int dataset_resistance;
-extern Dataset_int dataset_co2;
-extern Dataset_float dataset_temperature;
-
-extern const int messungsDelay;
-
 typedef struct
 {
     uint32_t data[VALUECOUNT];
@@ -55,15 +48,24 @@ typedef struct
 
 } Measurement_state;
 
+extern SemaphoreHandle_t sema_measurement;
+extern Dataset_int dataset_resistance;
+extern Dataset_int dataset_co2;
+extern Dataset_float dataset_temperature;
+
+extern const int messungsDelay;
+
 void initialize_dataset_int(Dataset_int *ds);
 void initialize_dataset_float(Dataset_float *ds);
 uint8_t update_dataset_int(Dataset_int *ds, uint32_t value);
 uint8_t update_dataset_float(Dataset_float *ds, float value);
-
-uint32_t update_remaining_time(Dataset_int *ds);
-// uint32_t update_remaining_time(Dataset_float *ds);
-
-float calculate_trend(Dataset_int *ds);
+float calculate_trend_int(Dataset_int *ds);
+float calculate_trend_float(Dataset_float *ds);
+uint32_t get_latest_value_int(Dataset_int *ds);
+float get_latest_value_float(Dataset_float *ds);
+Phase calculate_phase(Measurement_state *state);
+time_t update_elapsed_time(Measurement_state *state);
+time_t calculate_remaining_time(Measurement_state *state);
 void check_events(Dataset_int *ds);
 
 void task_dataanalysis(void *pvParameters);

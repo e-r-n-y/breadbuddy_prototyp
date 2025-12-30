@@ -81,12 +81,18 @@ time_t start_time;
 time_t stop_time;
 time_t duration;
 
+// Dataanalysis
+#include "analysis.h"
+Dataset_int dataset_resistance;
+Dataset_int dataset_co2;
+Dataset_float dataset_temperature;
+
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
 
 // Settings für Messung
 char messungsname[64];
-const int messungsDelay = 900000; // 15 * 60 * 1000 = 900.000
+const int messungsDelay = 300000; // 900000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
 {
@@ -155,7 +161,7 @@ void app_main(void)
     xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
     xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
     xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
-    // xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
+    //  xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
     xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
     xTaskCreate(webserver_task, "webserver", 16384, NULL, 5, NULL);
 }

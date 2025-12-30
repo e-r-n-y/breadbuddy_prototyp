@@ -12,6 +12,7 @@ idf_component_register(
         "webserver.c"
         "current_time.c"
         "probe_data.c"
+        "analysis.c"
     INCLUDE_DIRS 
         "."     
     PRIV_REQUIRES 
