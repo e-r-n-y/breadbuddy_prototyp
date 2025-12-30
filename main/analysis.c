@@ -123,7 +123,33 @@ float get_latest_value_float(Dataset_float *ds)
 
 Phase calculate_phase(Measurement_state *state)
 {
-    Phase temp = {0, 0, 0, 0, 0, 0, INITIAL, 0, 0};
+#define INITIAL_COUNT 20   // FIXME: abhängig von der Häufigkeit der Messungen
+#define LATENZ_COUNT 50    // FIXME: abhängig von der Häufigkeit der Messungen
+#define EXPANSION_COUNT 20 // FIXME: abhängig von der Häufigkeit der Messungen
+#define EMMISSON_COUNT 20  // FIXME: abhängig von der Häufigkeit der Messungen
+
+    // werte nicht stabilisiert = Initialphase
+
+    // widerstand neutral + co2 leichte Steigung = Latenzphase
+
+    if (dataset_resistance.count > INITIAL_COUNT && state->trend_resistance > -0.1 && state->trend_resistance < 0.1 && state->trend_co2 < 2.0)
+    {
+        ESP_LOGW("ANALYSIS", "Latenzphase wurde erkannt");
+        return LATENZ;
+    }
+
+    // widerstand steigung + co2 leichte Steigung = Expansionsphase
+    if (dataset_resistance.count > LATENZ_COUNT && state->trend_resistance > 0.1 && state->trend_resistance < 3.0 && state->trend_co2 < 3.0)
+    {
+        ESP_LOGW("ANALYSIS", "Expansionsphase wurde erkannt");
+        return EXPANSION;
+    }
+
+    // widerstand Peak bereits erreicht und negative Steigung + co2 steile Steigung = Emmissionsphase
+
+    // co2 negative Steigung = Degrationsphase
+
+    Phase temp = INITIAL;
     return temp;
 }
 time_t update_elapsed_time(Measurement_state *state)
@@ -133,6 +159,21 @@ time_t update_elapsed_time(Measurement_state *state)
 }
 time_t calculate_remaining_time(Measurement_state *state)
 {
+
+    /*
+    TODO: mögliche Berechnungen
+    - Über Erfahrungswerte bei Gesamtzeit und Temperatur (Stauchungsfaktor)
+    - Ermitteln in welcher Phase die Messung ist Ende der Phase berechnen + Standardzeit
+    - Über Eckpunkte (Start, Phasenübergänge, Temperatur, sonstige Indikatoren) einen Stauchungsfaktor bestimmen
+    - Niveau der aktuellen Werte mit üblichen Maximalwerten (Gesamt und je Phase) vergleichen und Dauer hochrechnen
+    - Über Zusammensetzung der Probe (Wassergehalt, Startermenge, Salzgehalt)
+    - Startermenge: Berechnung über exponetielles Wachstum
+    - Steigung des CO2-Gehalts an Indiz für die Aktivität des Sauerteigs nehmen
+    -
+
+    - Mehrere Werte ermitteln und gewichtet Mitteln
+    */
+
     time_t temp = 0;
     return temp;
 }
@@ -196,19 +237,6 @@ void task_dataanalysis(void *pvParameters)
 
             state.elapsed_time = update_elapsed_time(&state);        // TODO:
             state.remaining_time = calculate_remaining_time(&state); // TODO: In dieser Funktion sollten mehreer Berechnungen zusammenfließen
-
-            /*
-            TODO: mögliche Berechnungen
-            - Über Erfahrungswerte bei Gesamtzeit und Temperatur (Stauchungsfaktor)
-            - Ermitteln in welcher Phase die Messung ist Ende der Phase berechnen + Standardzeit
-            - Über Eckpunkte (Start, Phasenübergänge, Temperatur, sonstige Indikatoren) einen Stauchungsfaktor bestimmen
-            - Niveau der aktuellen Werte mit üblichen Maximalwerten (Gesamt und je Phase) vergleichen und Dauer hochrechnen
-            - Über Zusammensetzung der Probe (Wassergehalt, Startermenge, Salzgehalt)
-            - Startermenge: Berechnung über exponetielles Wachstum
-
-
-
-            */
 
             xSemaphoreGive(sema_measurement);
             // TODO: vTaskDelay(pdMS_TO_TICKS(messungsDelay));
