@@ -42,6 +42,10 @@ extern const int messungsDelay;
 extern float temp_obj;
 extern float temp_amb;
 extern i2c_dev_t temp_dev;
+
+#include "analysis.h"
+extern Measurement_state state;
+
 esp_err_t mlx90614_read_temperature(i2c_dev_t *dev, uint8_t reg, float *temperature);
 void init_temp_sensor();
 // =======================================

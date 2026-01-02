@@ -35,7 +35,7 @@ extern const int messungsDelay;
 #define RES_GPIO GPIO_NUM_18
 
 // Werte für Messung
-#define RESISTOR_VALUE_OHMS 2150 // 6700 // Value of the known resistor in ohms
+#define RESISTOR_VALUE_OHMS 6700 // 2150 // 6700 // Value of the known resistor in ohms
 extern int adc_res_raw;
 extern int adc_res_voltage;
 extern uint32_t resistance;
@@ -43,9 +43,12 @@ extern uint32_t last_resistance;
 extern time_t knickpunkt; // besseren Name finden
 extern bool knickpunkt_erreicht;
 extern uint32_t time_remain;
-extern uint32_t time_ready;
+extern time_t time_ready;
 extern time_t duration;
 extern time_t start_time;
+
+#include "analysis.h"
+extern Measurement_state state;
 
 // Funktionen
 bool adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);

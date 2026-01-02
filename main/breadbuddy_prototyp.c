@@ -63,7 +63,7 @@ char notizen[1024];
 char bake_rest_time[64] = "---";
 uint32_t time_remain = 25200; // 7 Stunden ab Knickpunkt (wo Teig beginnt sich auszudehnen)
 char bake_time[64] = "---";
-uint32_t time_ready = 0;
+time_t time_ready = 0;
 char last_bake_time[64] = "---";
 bool baking = false;
 
@@ -86,13 +86,15 @@ time_t duration;
 Dataset_int dataset_resistance;
 Dataset_int dataset_co2;
 Dataset_float dataset_temperature;
+Phase phase = INITIAL;
+Measurement_state state;
 
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
 
 // Settings für Messung
 char messungsname[64];
-const int messungsDelay = 300000; // 900000; // 15 * 60 * 1000 = 900.000
+const int messungsDelay = 15000; // 900000; // 15 * 60 * 1000 = 900.000
 
 void app_main(void)
 {
@@ -158,10 +160,11 @@ void app_main(void)
     ESP_ERROR_CHECK(i2cdev_init());
     ESP_LOGI("MAIN", "i2cdev library initialized");
 
-    xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
-    xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
-    xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
-    //  xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
-    xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
+    // xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
+    // xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
+    // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
+    //   xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
+    // xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
     xTaskCreate(webserver_task, "webserver", 16384, NULL, 5, NULL);
+    xTaskCreate(dataanalysis_task, "analysis", 4096, NULL, 5, NULL);
 }

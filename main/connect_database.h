@@ -15,6 +15,7 @@
 #include <driver/gpio.h>
 
 #include "httprequest.h"
+#include "analysis.h"
 
 // Allgemeines
 extern SemaphoreHandle_t sema_measurement;
@@ -30,10 +31,13 @@ extern uint32_t co2_ppm;
 extern uint32_t adc_eth_ppm;
 extern float ph_value;
 extern uint32_t time_remain;
-extern uint32_t time_ready;
+extern time_t time_ready;
 extern bool baking;
 extern probe_data_t probendaten;
 extern char notizen[1024];
-
+extern Dataset_int dataset_resistance;
+extern Dataset_int dataset_co2;
+extern Dataset_float dataset_temperature;
+extern Measurement_state state;
 // Funktionen
 void database_task(void *pvParameters);

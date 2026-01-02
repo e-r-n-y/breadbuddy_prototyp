@@ -20,7 +20,7 @@ void database_task(void *pvParameters)
         if (xSemaphoreTake(sema_measurement, (TickType_t)100) == pdTRUE)
         {
 
-            http_post_alldata(messungsname, temp_obj, temp_amb_co2, humidity, resistance, co2_ppm, adc_eth_ppm, ph_value, time_remain, time_ready, baking, &probendaten, notizen);
+            http_post_alldata(messungsname, temp_obj, temp_amb_co2, humidity, resistance, co2_ppm, adc_eth_ppm, ph_value, (uint32_t)state.remaining_time, time_ready, baking, &probendaten, notizen);
 
             // CLEANUP
             baking = false;

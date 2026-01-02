@@ -123,59 +123,140 @@ float get_latest_value_float(Dataset_float *ds)
 
 Phase calculate_phase(Measurement_state *state)
 {
-#define INITIAL_COUNT 20   // FIXME: abhängig von der Häufigkeit der Messungen
-#define LATENZ_COUNT 50    // FIXME: abhängig von der Häufigkeit der Messungen
-#define EXPANSION_COUNT 20 // FIXME: abhängig von der Häufigkeit der Messungen
-#define EMMISSON_COUNT 20  // FIXME: abhängig von der Häufigkeit der Messungen
 
+    Phase temp = state->phase;
     // werte nicht stabilisiert = Initialphase
 
     // widerstand neutral + co2 leichte Steigung = Latenzphase
-
-    if (dataset_resistance.count > INITIAL_COUNT && state->trend_resistance > -0.1 && state->trend_resistance < 0.1 && state->trend_co2 < 2.0)
+    if (state->phase == INITIAL && state->trend_resistance > -15 && state->trend_resistance < 15 && state->trend_co2 < 100)
     {
         ESP_LOGW("ANALYSIS", "Latenzphase wurde erkannt");
         return LATENZ;
     }
 
     // widerstand steigung + co2 leichte Steigung = Expansionsphase
-    if (dataset_resistance.count > LATENZ_COUNT && state->trend_resistance > 0.1 && state->trend_resistance < 3.0 && state->trend_co2 < 3.0)
+    if (state->phase == LATENZ && state->trend_resistance > 20 && state->trend_resistance < 200 && state->trend_co2 > 100 && state->trend_co2 < 700)
     {
         ESP_LOGW("ANALYSIS", "Expansionsphase wurde erkannt");
         return EXPANSION;
     }
 
     // widerstand Peak bereits erreicht und negative Steigung + co2 steile Steigung = Emmissionsphase
+    if (state->phase == EXPANSION && state->trend_co2 > 700)
+    {
+        ESP_LOGW("ANALYSIS", "Emmissionsphase wurde erkannt");
+        return EMMISION;
+    }
 
     // co2 negative Steigung = Degrationsphase
+    if (state->phase == EMMISION && state->trend_co2 > 700)
+    {
+        ESP_LOGW("ANALYSIS", "Degrationsphase wurde erkannt");
+        return DEGRATION;
+    }
 
-    Phase temp = INITIAL;
     return temp;
 }
-time_t update_elapsed_time(Measurement_state *state)
-{
-    time_t temp = 0;
-    return temp;
-}
-time_t calculate_remaining_time(Measurement_state *state)
-{
 
+void update_elapsed_time(Measurement_state *state)
+{
+    time_t now;
+    time(&now);
+
+    state->elapsed_time = now - start_time;
+    ESP_LOGI("ANALYSIS", "Time NOW %lld", now);
+    ESP_LOGI("ANALYSIS", "Time START %lld", start_time);
+    ESP_LOGI("ANALYSIS", "Time ELAPSED %lld", state->elapsed_time);
+}
+
+/*
+TODO: mögliche Berechnungen
+- Über Erfahrungswerte bei Gesamtzeit und Temperatur (Stauchungsfaktor)
+- Ermitteln in welcher Phase die Messung ist Ende der Phase berechnen + Standardzeit
+- Über Eckpunkte (Start, Phasenübergänge, Temperatur, sonstige Indikatoren) einen Stauchungsfaktor bestimmen
+- Niveau der aktuellen Werte mit üblichen Maximalwerten (Gesamt und je Phase) vergleichen und Dauer hochrechnen
+- Über Zusammensetzung der Probe (Wassergehalt, Startermenge, Salzgehalt)
+- Startermenge: Berechnung über exponetielles Wachstum
+- Steigung des CO2-Gehalts an Indiz für die Aktivität des Sauerteigs nehmen
+-
+
+- Mehrere Werte ermitteln und gewichtet Mitteln
+*/
+void calculate_remaining_time(Measurement_state *state)
+{
+    // TODO: Referenzkurve /-zeiten für eine Sauerteiggährung
+    // Dauer - Gesamt bis Backreife
+    // Dauer - einzelne Phasen
+
+    // TODO: Faktor nach Temperatur (laut einer Grafik)
+    // 25 - 45 Grad ideal 90% bei 35 100%
+    // 20 -25 Grad 60%
+    // 10-20 Grad 50%
+    // Linear von 20/50 auf 35/100
+    // lineare Gleichung y = k * x + d
     /*
-    TODO: mögliche Berechnungen
-    - Über Erfahrungswerte bei Gesamtzeit und Temperatur (Stauchungsfaktor)
-    - Ermitteln in welcher Phase die Messung ist Ende der Phase berechnen + Standardzeit
-    - Über Eckpunkte (Start, Phasenübergänge, Temperatur, sonstige Indikatoren) einen Stauchungsfaktor bestimmen
-    - Niveau der aktuellen Werte mit üblichen Maximalwerten (Gesamt und je Phase) vergleichen und Dauer hochrechnen
-    - Über Zusammensetzung der Probe (Wassergehalt, Startermenge, Salzgehalt)
-    - Startermenge: Berechnung über exponetielles Wachstum
-    - Steigung des CO2-Gehalts an Indiz für die Aktivität des Sauerteigs nehmen
-    -
-
-    - Mehrere Werte ermitteln und gewichtet Mitteln
+    float k = 3.33333;
+    float d = -16.666667;
+    float temperatur = 27.4;
+    float effizienz = k * temperatur + d;
     */
 
-    time_t temp = 0;
-    return temp;
+    // TODO: Faktor nach Startermenge
+    // Referenzkurve mit 15% Starter
+    // Vergleich mit 5%, 10%, 20%, 25%
+    // lineare ?? Gleichung für Faktor
+
+    // TODO: Faktor nach Wassergehalt
+    // Referenzkurve mit 73% Wassergehalt
+    // Vergleich mit 65%, 70%, 75%, 80%, 85%
+    // Gleichung für Faktor
+
+    // TODO: 1.) Berechnung rein nach Zeit mit Faktor Temperatur und Startermenge
+
+    // TODO: 2.) Berechnung nach Phasen mit Referenzzeiten
+    if (state->phase == LATENZ)
+    {
+        // Steigung von Latenzphase hochrechnen und Standard Expansionsphase dazurechnen
+        // Steigung CO2 als Indikator für Aktivität nehmen
+        // Faktor für Startermenge
+        // Faktor für Temperatur
+    }
+
+    if (state->phase == EXPANSION)
+    {
+        // Steigung von Expansionsphase hochrechnen
+        // Steigung CO2 als Indikator für Aktivität nehmen
+        // Faktor für Startermenge
+        // Faktor für Temperatur
+    }
+
+    // TODO: 3.) Berechnung über eintretende Events (Knickpunkt, Temperaturanstieg)
+
+    // TODO: 4.) Berechnung über Niveau, Steigung und übliche Maximalwerte
+
+    // TODO: 5.) Berechnung über exponentielles Wachstum der Starterkultur
+    // Referenzzusammensetzung
+    // 100% Mehl, 73% Wasser, 15% Starter, 1,8% Salz - Dauer 10 Stunden bis Backreife
+    // 15% Starter bedeuten hier 7,9% der Gesamtmasse (100 + 73 + 15 + 1.8 = 189,8) => 15 / 189,8 = 7,9 %
+    float starter_anteil = probendaten.starter.menge_g / (probendaten.mehl.menge_g + probendaten.wasser.menge_g + probendaten.starter.menge_g + probendaten.salz.menge_g) * 100.0f;
+    float verduennungsfaktor = 100.0f / starter_anteil;
+    float verdoppelungen = log2(verduennungsfaktor);
+    float verdoppelungszeit = 2.75; // TODO: Dieser Faktor ist die Zeitabhängige komponenten und hier sollten Faktoren wie Temp einfließen
+    float gesamtdauer = verdoppelungen * verdoppelungszeit;
+    time_t remaining_time_5 = (time_t)(gesamtdauer * 3600) - state->elapsed_time;
+    ESP_LOGI("ANALYSIS", "Anteil Starter %.2f%%", (probendaten.starter.menge_g / probendaten.mehl.menge_g * 100.0f));
+    ESP_LOGI("ANALYSIS", "Anteil Starter an Gesamtmenge %.2f%%", starter_anteil);
+    ESP_LOGI("ANALYSIS", "Verdünnungsfaktor %.2f", verduennungsfaktor);
+    ESP_LOGI("ANALYSIS", "Verdoppelungen %.2f", verdoppelungen);
+    ESP_LOGI("ANALYSIS", "Gesamtdauer %.2f Stunden", gesamtdauer);
+    ESP_LOGI("ANALYSIS", "Verbleibende Zeit %lld", remaining_time_5);
+
+    time_t now;
+    time(&now);
+    ESP_LOGI("ANALYSIS", "Backzeit %lld", now + remaining_time_5);
+
+    // TODO: gewichteter Mittelwert ermitteln
+    state->remaining_time = remaining_time_5;
 }
 
 void check_events(Dataset_int *ds)
@@ -207,17 +288,25 @@ void check_events(Dataset_int *ds)
     }
 }
 
-void task_dataanalysis(void *pvParameters)
+void dataanalysis_task(void *pvParameters)
 {
-
-    Measurement_state state;
+    // State initialisieren
     state.elapsed_time = 0;
-    // state.remaining_time = 0;
+    state.remaining_time = 0;
+    state.phase = INITIAL;
+
+    initialize_dataset_int(&dataset_resistance);
+    initialize_dataset_int(&dataset_co2);
+    initialize_dataset_float(&dataset_temperature);
 
     while (true)
     {
         if (xSemaphoreTake(sema_measurement, (TickType_t)100) == pdTRUE)
         {
+            // Stack-Nutzung prüfen
+            UBaseType_t stackRemaining = uxTaskGetStackHighWaterMark(NULL);
+            ESP_LOGW("ANALYSIS", "Stack remaining: %u words", stackRemaining);
+
             // Resistance-Dataset
             state.trend_resistance = calculate_trend_int(&dataset_resistance);
             state.value_resistance = get_latest_value_int(&dataset_resistance);
@@ -235,11 +324,24 @@ void task_dataanalysis(void *pvParameters)
 
             // TODO: eventuell in struct auch notieren wann jede Phase begonnen hat um hochrechnen zu können
 
-            state.elapsed_time = update_elapsed_time(&state);        // TODO:
-            state.remaining_time = calculate_remaining_time(&state); // TODO: In dieser Funktion sollten mehreer Berechnungen zusammenfließen
+            update_elapsed_time(&state);      // TODO:
+            calculate_remaining_time(&state); // TODO: In dieser Funktion sollten mehrere Berechnungen zusammenfließen
+
+            // TODO: Restzeit als HH:MM formatieren
+            int hours = state.remaining_time / 3600;
+            int minutes = (state.remaining_time % 3600) / 60;
+            snprintf(bake_rest_time, sizeof(bake_rest_time), "%02d:%02d", hours, minutes);
+
+            // Backzeitpunkt berechnen
+            time_ready = start_time + state.remaining_time + state.elapsed_time;
+            // ESP_LOGI("ANALYSIS", "vorauss. Endzeit: %lld", time_ready);
+
+            localtime_r(&time_ready, &timeinfo);
+            strftime(bake_time, sizeof(bake_time), "%H:%M", &timeinfo);
 
             xSemaphoreGive(sema_measurement);
             // TODO: vTaskDelay(pdMS_TO_TICKS(messungsDelay));
+            vTaskDelay(pdMS_TO_TICKS(messungsDelay / 2));
         }
     }
 }

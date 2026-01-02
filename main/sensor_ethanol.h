@@ -36,5 +36,8 @@ extern int adc_eth_raw;
 extern float adc_eth_voltage;
 extern uint32_t adc_eth_ppm;
 
+#include "analysis.h"
+extern Measurement_state state;
+
 // Funktionen
 void ethanol_task(void *pvParameters);

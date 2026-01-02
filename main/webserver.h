@@ -19,6 +19,7 @@
 #include "connect_wifi.h"
 #include "probe_data.h"
 #include "httprequest.h"
+#include "analysis.h"
 
 #include <time.h>
 #include <sys/time.h>
@@ -45,8 +46,8 @@ extern char zusammenfassung_html[8192];
 extern char style_css[4096];
 extern char response_data[4096];
 
-static esp_err_t read_file(const char *path, char *buffer, size_t buffer_size);
-static void init_web_page_buffers(void);
+esp_err_t read_file(const char *path, char *buffer, size_t buffer_size);
+void init_web_page_buffers(void);
 esp_err_t send_web_page(httpd_req_t *req, const char *content);
 esp_err_t get_req_handler(httpd_req_t *req);
 size_t readValue(char *buf, char *key, char *output, size_t output_size);
@@ -89,7 +90,7 @@ extern float last_ph_value;
 extern char last_ph_time[64];
 extern ph_t ph_array[32];
 extern uint32_t time_remain;
-extern uint32_t time_ready;
+extern time_t time_ready;
 
 extern char messungsname[64];
 
@@ -107,3 +108,5 @@ extern uint32_t last_resistance;
 extern bool knickpunkt_erreicht;
 extern int adc_eth_raw;
 extern float adc_eth_voltage;
+
+extern Measurement_state state;

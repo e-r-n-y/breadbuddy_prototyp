@@ -3,6 +3,7 @@
 // System Includes
 #include <stdio.h>
 #include <inttypes.h>
+#include <math.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -34,6 +35,9 @@ extern i2c_dev_t co2_dev;
 extern uint32_t co2_ppm;
 extern float humidity;
 extern float temp_amb_co2;
+
+#include "analysis.h"
+extern Measurement_state state;
 
 // Funktionen
 void init_co2_sensor();

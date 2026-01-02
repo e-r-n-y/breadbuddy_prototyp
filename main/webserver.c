@@ -46,7 +46,7 @@ httpd_uri_t uri_favicon = {
     .user_ctx = NULL};
 
 // Allgemeine Funktion zum Lesen einer Datei
-static esp_err_t read_file(const char *path, char *buffer, size_t buffer_size)
+esp_err_t read_file(const char *path, char *buffer, size_t buffer_size)
 {
     memset(buffer, 0, buffer_size);
     struct stat st;
@@ -68,7 +68,7 @@ static esp_err_t read_file(const char *path, char *buffer, size_t buffer_size)
 }
 
 // sollte passen - lädt Files in einen Buffer
-static void init_web_page_buffers(void)
+void init_web_page_buffers(void)
 {
     esp_vfs_spiffs_conf_t conf = {
         .base_path = "/spiffs",
@@ -118,7 +118,6 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
     if (pos)
     {
         size_t before_len = pos - response_buffer;
-        size_t after_len = strlen(pos + strlen("{{MEASUREMENT_ID}}"));
         snprintf(temp, 8192, "%.*s%s%s",
                  (int)before_len, response_buffer,
                  measurement_id,
@@ -486,6 +485,41 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
                  (int)before_len, response_buffer,
                  elapsed_time_str,
                  pos + strlen("{{ELAPSED_TIME}}"));
+        strcpy(response_buffer, temp);
+    }
+
+    // Ersetze {{PHASE}}
+    pos = strstr(response_buffer, "{{PHASE}}");
+    if (pos)
+    {
+        const char *phase_str;
+        switch (state.phase)
+        {
+        case INITIAL:
+            phase_str = "Initialphase";
+            break;
+        case LATENZ:
+            phase_str = "Latenzphase";
+            break;
+        case EXPANSION:
+            phase_str = "Expansionsphase";
+            break;
+        case EMMISION:
+            phase_str = "Emissionsphase";
+            break;
+        case DEGRATION:
+            phase_str = "Degradationsphase";
+            break;
+        default:
+            phase_str = "Unbekannt";
+            break;
+        }
+
+        size_t before_len = pos - response_buffer;
+        snprintf(temp, 8192, "%.*s%s%s",
+                 (int)before_len, response_buffer,
+                 phase_str,
+                 pos + strlen("{{PHASE}}"));
         strcpy(response_buffer, temp);
     }
 

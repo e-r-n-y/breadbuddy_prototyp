@@ -7,9 +7,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include <esp_log.h>
+#include <math.h>
 
-#define VALUECOUNT 100
-#define WINDOW_SIZE 4
+#include "probe_data.h"
+
+#define VALUECOUNT 128
+#define WINDOW_SIZE 5
 
 typedef enum
 {
@@ -52,8 +56,14 @@ extern SemaphoreHandle_t sema_measurement;
 extern Dataset_int dataset_resistance;
 extern Dataset_int dataset_co2;
 extern Dataset_float dataset_temperature;
-
+extern Measurement_state state;
+extern struct tm timeinfo;
+extern time_t start_time;
+extern probe_data_t probendaten;
 extern const int messungsDelay;
+extern char bake_rest_time[64];
+extern char bake_time[64];
+extern time_t time_ready;
 
 void initialize_dataset_int(Dataset_int *ds);
 void initialize_dataset_float(Dataset_float *ds);
@@ -64,8 +74,8 @@ float calculate_trend_float(Dataset_float *ds);
 uint32_t get_latest_value_int(Dataset_int *ds);
 float get_latest_value_float(Dataset_float *ds);
 Phase calculate_phase(Measurement_state *state);
-time_t update_elapsed_time(Measurement_state *state);
-time_t calculate_remaining_time(Measurement_state *state);
+void update_elapsed_time(Measurement_state *state);
+void calculate_remaining_time(Measurement_state *state);
 void check_events(Dataset_int *ds);
 
-void task_dataanalysis(void *pvParameters);
+void dataanalysis_task(void *pvParameters);
