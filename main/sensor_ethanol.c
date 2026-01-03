@@ -45,7 +45,7 @@ void ethanol_task(void *pvParameters)
             ESP_LOGI(TAG_ETH, "Ethanol PPM: %d\n", adc_eth_ppm);
 
             xSemaphoreGive(sema_measurement);
-            vTaskDelay(pdMS_TO_TICKS(messungsDelay));
+            vTaskDelay(pdMS_TO_TICKS(messungsDelay - 5000 - 1000));
         }
     }
 }

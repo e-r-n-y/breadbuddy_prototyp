@@ -187,7 +187,7 @@ void resistance_task(void *pvParameters)
 
             ESP_ERROR_CHECK(gpio_set_level((gpio_num_t)RES_GPIO, 0));
             xSemaphoreGive(sema_measurement);
-            vTaskDelay(pdMS_TO_TICKS(messungsDelay));
+            vTaskDelay(pdMS_TO_TICKS(messungsDelay - 5000 - 2000));
         }
     }
 

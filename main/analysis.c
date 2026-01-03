@@ -178,8 +178,6 @@ TODO: mögliche Berechnungen
 - Über Zusammensetzung der Probe (Wassergehalt, Startermenge, Salzgehalt)
 - Startermenge: Berechnung über exponetielles Wachstum
 - Steigung des CO2-Gehalts an Indiz für die Aktivität des Sauerteigs nehmen
--
-
 - Mehrere Werte ermitteln und gewichtet Mitteln
 */
 void calculate_remaining_time(Measurement_state *state)
@@ -244,12 +242,12 @@ void calculate_remaining_time(Measurement_state *state)
     float verdoppelungszeit = 2.75; // TODO: Dieser Faktor ist die Zeitabhängige komponenten und hier sollten Faktoren wie Temp einfließen
     float gesamtdauer = verdoppelungen * verdoppelungszeit;
     time_t remaining_time_5 = (time_t)(gesamtdauer * 3600) - state->elapsed_time;
-    ESP_LOGI("ANALYSIS", "Anteil Starter %.2f%%", (probendaten.starter.menge_g / probendaten.mehl.menge_g * 100.0f));
-    ESP_LOGI("ANALYSIS", "Anteil Starter an Gesamtmenge %.2f%%", starter_anteil);
-    ESP_LOGI("ANALYSIS", "Verdünnungsfaktor %.2f", verduennungsfaktor);
-    ESP_LOGI("ANALYSIS", "Verdoppelungen %.2f", verdoppelungen);
-    ESP_LOGI("ANALYSIS", "Gesamtdauer %.2f Stunden", gesamtdauer);
-    ESP_LOGI("ANALYSIS", "Verbleibende Zeit %lld", remaining_time_5);
+    ESP_LOGI("ANALYSIS_5", "Anteil Starter %.2f%%", (probendaten.starter.menge_g / probendaten.mehl.menge_g * 100.0f));
+    ESP_LOGI("ANALYSIS_5", "Anteil Starter an Gesamtmenge %.2f%%", starter_anteil);
+    ESP_LOGI("ANALYSIS_5", "Verdünnungsfaktor %.2f", verduennungsfaktor);
+    ESP_LOGI("ANALYSIS_5", "Verdoppelungen %.2f", verdoppelungen);
+    ESP_LOGI("ANALYSIS_5", "Gesamtdauer %.2f Stunden", gesamtdauer);
+    ESP_LOGI("ANALYSIS_5", "Verbleibende Zeit %lld", remaining_time_5);
 
     time_t now;
     time(&now);
@@ -340,8 +338,7 @@ void dataanalysis_task(void *pvParameters)
             strftime(bake_time, sizeof(bake_time), "%H:%M", &timeinfo);
 
             xSemaphoreGive(sema_measurement);
-            // TODO: vTaskDelay(pdMS_TO_TICKS(messungsDelay));
-            vTaskDelay(pdMS_TO_TICKS(messungsDelay / 2));
+            vTaskDelay(pdMS_TO_TICKS(messungsDelay / 3));
         }
     }
 }
