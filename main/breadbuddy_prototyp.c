@@ -163,7 +163,7 @@ void app_main(void)
     // xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
     // xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
     // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
-    xTaskCreate(temp_task, "temp", 3072, NULL, 5, NULL);
+    xTaskCreate(temp_task, "temp", 4096, NULL, 5, NULL);
     // xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
     xTaskCreate(webserver_task, "webserver", 16384, NULL, 5, NULL);
     // xTaskCreate(dataanalysis_task, "analysis", 4096, NULL, 5, NULL);

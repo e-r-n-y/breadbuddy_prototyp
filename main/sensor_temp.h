@@ -50,6 +50,8 @@ extern i2c_dev_t temp_dev;
 #include "analysis.h"
 extern Measurement_state state;
 
+unsigned char calc_crc(unsigned char data);
+bool d6t_check_pec(uint8_t *buffer, int length);
 esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature);
 esp_err_t mlx90614_read_temperature(i2c_dev_t *dev, uint8_t reg, float *temperature);
 void init_temp_sensor();

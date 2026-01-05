@@ -49,12 +49,13 @@ bool d6t_check_pec(uint8_t *buffer, int length)
 }
 
 /**
- * @brief Auslesen der Temperaturdaten
+ * @brief Auslesen der Temperaturdaten mit i2cdev
  */
 esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature)
 {
     uint8_t data[5];
 
+    /*
     // Mutex nehmen
     I2C_DEV_TAKE_MUTEX(dev);
 
@@ -73,10 +74,14 @@ esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature)
 
     // Mutex freigeben
     I2C_DEV_GIVE_MUTEX(dev);
+    */
+
+    // Mit i2cdev: Command schreiben (0x4C) und dann 5 Bytes lesen
+    esp_err_t ret = i2c_dev_read_reg(dev, D6T_CMD_READ, data, 5);
 
     if (ret == ESP_OK)
     {
-        // PEC Check durchführen
+        // PEC Check durchführen (letztes Byte ist PEC, daher 4 Datenbytes)
         if (d6t_check_pec(data, 4))
         {
             // Umrechnung der Daten
@@ -93,6 +98,7 @@ esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature)
         else
         {
             ESP_LOGE(TAG_TEMP, "PEC Check Fehler! Daten korrupt.");
+            return ESP_ERR_INVALID_CRC;
         }
     }
     else
