@@ -128,14 +128,14 @@ Phase calculate_phase(Measurement_state *state)
     // werte nicht stabilisiert = Initialphase
 
     // widerstand neutral + co2 leichte Steigung = Latenzphase
-    if (state->phase == INITIAL && state->trend_resistance > -15 && state->trend_resistance < 15 && state->trend_co2 < 100)
+    if (state->phase == INITIAL && state->trend_resistance < 15 && state->trend_co2 < 150)
     {
         ESP_LOGW("ANALYSIS", "Latenzphase wurde erkannt");
         return LATENZ;
     }
 
     // widerstand steigung + co2 leichte Steigung = Expansionsphase
-    if (state->phase == LATENZ && state->trend_resistance > 20 && state->trend_resistance < 200 && state->trend_co2 > 100 && state->trend_co2 < 700)
+    if (state->phase == LATENZ && state->trend_resistance > 15 && state->trend_co2 > 150)
     {
         ESP_LOGW("ANALYSIS", "Expansionsphase wurde erkannt");
         return EXPANSION;
@@ -149,9 +149,9 @@ Phase calculate_phase(Measurement_state *state)
     }
 
     // co2 negative Steigung = Degrationsphase
-    if (state->phase == EMMISION && state->trend_co2 > 700)
+    if (state->phase == EMMISION && state->trend_co2 < 500)
     {
-        ESP_LOGW("ANALYSIS", "Degrationsphase wurde erkannt");
+        ESP_LOGW("ANALYSIS", "Degradationsphase wurde erkannt");
         return DEGRATION;
     }
 

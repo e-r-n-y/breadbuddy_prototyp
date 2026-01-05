@@ -15,7 +15,7 @@
 #include <driver/gpio.h>
 
 // includes für Sensor
-#include "mlx90614.h"
+// #include "mlx90614.h"
 
 // Allgemeines
 extern const char *TAG_TEMP;
@@ -28,16 +28,20 @@ extern const int messungsDelay;
 // #define TEMP_I2C_PORT 1 // einzelne Ports-Variante
 #define TEMP_I2C_MASTER_SCL GPIO_NUM_1
 #define TEMP_I2C_MASTER_SDA GPIO_NUM_2
-#define MASTER_FREQUENCY 100000 // brauch ich das?
-#define MLX90614_I2C_ADDRESS 0x5A
 #define TEMP_I2C_PORT GPIO_NUM_0
+#define MASTER_FREQUENCY 100000 // brauch ich das?
+#define D6T_I2C_ADDRESS 0x0A
+#define D6T_CMD_READ 0x4C
+
+// MLX90614
+#define MLX90614_I2C_ADDRESS 0x5A
+#define MLX90614_TA 0x06    // Ambient temperature
+#define MLX90614_TOBJ1 0x07 // Object temperature
 
 // =====================================
 // Umbau auf i2cdev
 #include <i2cdev.h>
 // MLX90614 Register Adressen
-#define MLX90614_TA 0x06    // Ambient temperature
-#define MLX90614_TOBJ1 0x07 // Object temperature
 // Externe Variablen
 extern float temp_obj;
 extern float temp_amb;
@@ -46,6 +50,7 @@ extern i2c_dev_t temp_dev;
 #include "analysis.h"
 extern Measurement_state state;
 
+esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature);
 esp_err_t mlx90614_read_temperature(i2c_dev_t *dev, uint8_t reg, float *temperature);
 void init_temp_sensor();
 // =======================================

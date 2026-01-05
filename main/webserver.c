@@ -508,7 +508,7 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
             phase_str = "Emissionsphase";
             break;
         case DEGRATION:
-            phase_str = "Degradierungsphase";
+            phase_str = "Degradationsphase";
             break;
         default:
             phase_str = "Unbekannt";
