@@ -508,7 +508,7 @@ esp_err_t send_web_page(httpd_req_t *req, const char *content)
             phase_str = "Emissionsphase";
             break;
         case DEGRATION:
-            phase_str = "Degradationsphase";
+            phase_str = "Degradierungsphase";
             break;
         default:
             phase_str = "Unbekannt";
@@ -744,6 +744,12 @@ esp_err_t post_req_handler(httpd_req_t *req)
             strcpy(measurement_stop_date, "---");
             strcpy(measurement_duration, "---");
             strcpy(elapsed_time_str, "---");
+            state.elapsed_time = 0;
+            state.remaining_time = 0;
+            state.phase = INITIAL;
+            initialize_dataset_int(&dataset_resistance);
+            initialize_dataset_int(&dataset_co2);
+            initialize_dataset_float(&dataset_temperature);
 
             web_state = 0;
         }

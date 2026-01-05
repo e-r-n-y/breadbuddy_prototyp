@@ -61,7 +61,7 @@ char notizen[1024];
 // webserver
 #include "webserver.h"
 char bake_rest_time[64] = "---";
-uint32_t time_remain = 25200; // 7 Stunden ab Knickpunkt (wo Teig beginnt sich auszudehnen)
+uint32_t time_remain = 0; // 7 Stunden ab Knickpunkt (wo Teig beginnt sich auszudehnen)
 char bake_time[64] = "---";
 time_t time_ready = 0;
 char last_bake_time[64] = "---";

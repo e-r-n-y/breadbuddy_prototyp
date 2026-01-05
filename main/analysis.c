@@ -254,7 +254,14 @@ void calculate_remaining_time(Measurement_state *state)
     ESP_LOGI("ANALYSIS", "Backzeit %lld", now + remaining_time_5);
 
     // TODO: gewichteter Mittelwert ermitteln
-    state->remaining_time = remaining_time_5;
+    if (remaining_time_5 < 0)
+    {
+        state->remaining_time = 0;
+    }
+    else
+    {
+        state->remaining_time = remaining_time_5;
+    }
 }
 
 void check_events(Dataset_int *ds)
@@ -326,9 +333,17 @@ void dataanalysis_task(void *pvParameters)
             calculate_remaining_time(&state); // TODO: In dieser Funktion sollten mehrere Berechnungen zusammenfließen
 
             // TODO: Restzeit als HH:MM formatieren
-            int hours = state.remaining_time / 3600;
-            int minutes = (state.remaining_time % 3600) / 60;
-            snprintf(bake_rest_time, sizeof(bake_rest_time), "%02d:%02d", hours, minutes);
+            if (state.remaining_time == 0)
+            {
+                // wenn Zeit bereits abgelaufen ist
+                strcpy(bake_rest_time, "---");
+            }
+            else
+            {
+                int hours = state.remaining_time / 3600;
+                int minutes = (state.remaining_time % 3600) / 60;
+                snprintf(bake_rest_time, sizeof(bake_rest_time), "%02d:%02d", hours, minutes);
+            }
 
             // Backzeitpunkt berechnen
             time_ready = start_time + state.remaining_time + state.elapsed_time;
