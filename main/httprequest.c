@@ -2,14 +2,14 @@
 
 static const char *TAG = "breadbuddy_http_post";
 
-void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float humidity, uint32_t widerstand_ohm, uint32_t co2_ppm, uint32_t ethanol_ppm, float ph_value, uint32_t time_remain, uint32_t time_ready, bool baking, probe_data_t *probendaten, char *notizen)
+http_post_error_t http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float humidity, uint32_t widerstand_ohm, uint32_t co2_ppm, uint32_t ethanol_ppm, float ph_value, uint32_t time_remain, uint32_t time_ready, bool baking, probe_data_t *probendaten, char *notizen)
 {
     // Erstelle JSON-Objekt
     cJSON *root = cJSON_CreateObject();
     if (root == NULL)
     {
         ESP_LOGE(TAG, "Failed to create JSON object");
-        return;
+        return HTTP_POST_ERR_JSON_CREATE;
     }
 
     // Füge alle Felder hinzu
@@ -60,7 +60,7 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "Failed to print JSON");
         cJSON_Delete(root);
-        return;
+        return HTTP_POST_ERR_JSON_PRINT;
     }
 
     ESP_LOGI(TAG, "JSON: %s\n", json_string);
@@ -73,7 +73,7 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
         ESP_LOGE(TAG, "Failed to allocate http_request");
         cJSON_free(json_string);
         cJSON_Delete(root);
-        return;
+        return HTTP_POST_ERR_MEM_ALLOC;
     }
 
     sprintf(http_request,
@@ -99,12 +99,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     if (err != 0 || res == NULL)
     {
         ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
-        // CLEANUP!
         free(http_request);
         cJSON_free(json_string);
         cJSON_Delete(root);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        return;
+        return HTTP_POST_ERR_DNS_LOOKUP;
     }
 
     /* Code to print the resolved IP.
@@ -118,12 +116,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... Failed to allocate socket.");
         freeaddrinfo(res);
-        // CLEANUP!
         free(http_request);
         cJSON_free(json_string);
         cJSON_Delete(root);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        return;
+        return HTTP_POST_ERR_SOCKET_ALLOC;
     }
     ESP_LOGI(TAG, "... allocated socket");
 
@@ -132,12 +128,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
         ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
         close(s);
         freeaddrinfo(res);
-        // CLEANUP!
         free(http_request);
         cJSON_free(json_string);
         cJSON_Delete(root);
-        vTaskDelay(pdMS_TO_TICKS(4000));
-        return;
+        return HTTP_POST_ERR_SOCKET_CONNECT;
     }
 
     ESP_LOGI(TAG, "... connected");
@@ -147,12 +141,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... socket send failed");
         close(s);
-        // CLEANUP!
         free(http_request);
         cJSON_free(json_string);
         cJSON_Delete(root);
-        vTaskDelay(pdMS_TO_TICKS(4000));
-        return;
+        return HTTP_POST_ERR_SOCKET_SEND;
     }
     ESP_LOGI(TAG, "... socket send success");
 
@@ -164,12 +156,10 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     {
         ESP_LOGE(TAG, "... failed to set socket receiving timeout");
         close(s);
-        // CLEANUP!
         free(http_request);
         cJSON_free(json_string);
         cJSON_Delete(root);
-        vTaskDelay(pdMS_TO_TICKS(4000));
-        return;
+        return HTTP_POST_ERR_SOCKET_TIMEOUT;
     }
     ESP_LOGI(TAG, "... set socket receiving timeout success");
 
@@ -191,4 +181,6 @@ void http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float
     free(http_request);
     cJSON_free(json_string);
     cJSON_Delete(root);
+    
+    return HTTP_POST_SUCCESS;
 }

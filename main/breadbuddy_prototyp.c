@@ -94,7 +94,11 @@ SemaphoreHandle_t sema_measurement = NULL;
 
 // Settings für Messung
 char messungsname[64];
-const int messungsDelay = 5000; // 900000; // 15 * 60 * 1000 = 900.000
+const int messungsDelay = 900000; // 15 * 60 * 1000 = 900.000
+
+// Core-Definitionen
+#define CORE_WIFI 0    // Core 0 für WiFi/Webserver/Datenbank
+#define CORE_SENSORS 1 // Core 1 für Sensoren/Analyse
 
 void app_main(void)
 {
@@ -160,11 +164,20 @@ void app_main(void)
     ESP_ERROR_CHECK(i2cdev_init());
     ESP_LOGI("MAIN", "i2cdev library initialized");
 
-    // xTaskCreate(resistance_task, "resistance", 3072, NULL, 5, NULL);
-    // xTaskCreate(co2_task, "co2", 3072, NULL, 5, NULL);
-    // xTaskCreate(ethanol_task, "ethanol", 3072, NULL, 5, NULL);
-    xTaskCreate(temp_task, "temp", 4096, NULL, 5, NULL);
-    // xTaskCreate(database_task, "database", 4096, NULL, 5, NULL);
-    xTaskCreate(webserver_task, "webserver", 16384, NULL, 5, NULL);
-    // xTaskCreate(dataanalysis_task, "analysis", 4096, NULL, 5, NULL);
+    ESP_LOGI("MAIN", "Creating tasks and pinning to cores...");
+
+    // CORE 1: Sensor-Tasks (Echtzeit-Messungen)
+    xTaskCreatePinnedToCore(resistance_task, "resistance", 3072, NULL, 5, NULL, CORE_SENSORS);
+    xTaskCreatePinnedToCore(co2_task, "co2", 3072, NULL, 5, NULL, CORE_SENSORS);
+    xTaskCreatePinnedToCore(ethanol_task, "ethanol", 3072, NULL, 5, NULL, CORE_SENSORS);
+    xTaskCreatePinnedToCore(temp_task, "temp", 3072, NULL, 5, NULL, CORE_SENSORS);
+    xTaskCreatePinnedToCore(dataanalysis_task, "analysis", 4096, NULL, 5, NULL, CORE_SENSORS);
+
+    // CORE 0: WiFi/Netzwerk-Tasks (läuft auf gleichem Core wie WiFi-Stack)
+    xTaskCreatePinnedToCore(database_task, "database", 4096, NULL, 5, NULL, CORE_WIFI);
+    xTaskCreatePinnedToCore(webserver_task, "webserver", 16384, NULL, 5, NULL, CORE_WIFI);
+
+    ESP_LOGI("MAIN", "All tasks created successfully");
+    ESP_LOGI("MAIN", "Core 0: WiFi, Webserver, Database");
+    ESP_LOGI("MAIN", "Core 1: Sensors (Resistance, CO2, Ethanol, Temp), Analysis");
 }
