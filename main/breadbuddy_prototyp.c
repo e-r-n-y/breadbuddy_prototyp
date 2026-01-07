@@ -91,6 +91,7 @@ Measurement_state state;
 
 // Semaphoren
 SemaphoreHandle_t sema_measurement = NULL;
+SemaphoreHandle_t sema_mutex = NULL;
 
 // Settings für Messung
 char messungsname[64];
@@ -108,6 +109,13 @@ void app_main(void)
     if (sema_measurement == NULL)
     {
         ESP_LOGE("MAIN", "Failed to create semaphore for measurement");
+        return;
+    }
+    sema_mutex = xSemaphoreCreateMutex();
+
+    if (sema_mutex == NULL)
+    {
+        ESP_LOGE("MAIN", "Failed to create semaphore for mutex");
         return;
     }
 
