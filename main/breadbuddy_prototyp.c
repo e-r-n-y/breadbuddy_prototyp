@@ -14,12 +14,11 @@
 
 // für elektrischen Widerstand
 #include "sensor_resistance.h"
+// TODO: nicht global benötigte Werte in entsprechendes Taskfile
 int adc_res_raw = 0;
 int adc_res_voltage = 0;
 uint32_t resistance = 0;
 uint32_t last_resistance = 0;
-time_t knickpunkt; // besseren Name finden
-bool knickpunkt_erreicht = false;
 
 // für ethanol Messung
 #include "sensor_ethanol.h"
@@ -143,29 +142,6 @@ void app_main(void)
     };
 
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
-
-    /*
-    // *** I2C BUS RESET - 9 CLOCK PULSES ***
-    ESP_LOGI("MAIN", "Resetting I2C bus with 9 clock pulses...");
-
-    // Vor i2c_driver_install() aufrufen:
-    gpio_config_t io_conf = {
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = (1ULL << I2C_MASTER_SCL),
-        .pull_up_en = GPIO_PULLUP_ENABLE};
-        gpio_config(&io_conf);
-
-        for (int i = 0; i < 9; i++)
-        {
-            gpio_set_level(I2C_MASTER_SCL, 0);
-            esp_rom_delay_us(10);
-            gpio_set_level(I2C_MASTER_SCL, 1);
-            esp_rom_delay_us(10);
-        }
-
-        ESP_LOGI("MAIN", "I2C bus reset completed, SDA level: %d", gpio_get_level(I2C_MASTER_SDA));
-        vTaskDelay(pdMS_TO_TICKS(100));
-    */
 
     // *** ZENTRALE I2C-INITIALISIERUNG ***
     ESP_LOGI("MAIN", "Initializing I2C bus...");

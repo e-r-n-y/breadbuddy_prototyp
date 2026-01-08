@@ -721,7 +721,6 @@ esp_err_t post_req_handler(httpd_req_t *req)
             adc_res_voltage = 0;
             resistance = 0;
             last_resistance = 0;
-            knickpunkt_erreicht = false;
             adc_eth_raw = 0;
             adc_eth_voltage = 0.0;
             adc_eth_ppm = 0;

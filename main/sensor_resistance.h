@@ -40,8 +40,7 @@ extern int adc_res_raw;
 extern int adc_res_voltage;
 extern uint32_t resistance;
 extern uint32_t last_resistance;
-extern time_t knickpunkt; // besseren Name finden
-extern bool knickpunkt_erreicht;
+
 extern uint32_t time_remain;
 extern time_t time_ready;
 extern time_t duration;

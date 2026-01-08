@@ -18,7 +18,8 @@
 #define WEB_PATH "/measurements"
 
 /* HTTP POST Error Codes */
-typedef enum {
+typedef enum
+{
     HTTP_POST_SUCCESS = 0,
     HTTP_POST_ERR_JSON_CREATE = -1,
     HTTP_POST_ERR_JSON_PRINT = -2,
@@ -29,20 +30,5 @@ typedef enum {
     HTTP_POST_ERR_SOCKET_SEND = -7,
     HTTP_POST_ERR_SOCKET_TIMEOUT = -8
 } http_post_error_t;
-
-/*
-extern char messungsname[64];
-extern float temp_obj;
-extern float temp_amb;
-extern float humidity;
-extern uint32_t widerstand_ohm;
-extern uint32_t co2_ppm;
-extern uint32_t ethanol_ppm;
-extern float ph_value;
-extern bool baking;
-
-extern probe_data_t probendaten;
-extern char notizen[1024];
-*/
 
 http_post_error_t http_post_alldata(char *messungsname, float temp_obj, float temp_amb, float humidity, uint32_t widerstand_ohm, uint32_t co2_ppm, uint32_t ethanol_ppm, float ph_value, uint32_t time_remain, uint32_t time_ready, bool baking, probe_data_t *probendaten, char *notizen);

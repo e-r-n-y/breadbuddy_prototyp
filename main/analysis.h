@@ -53,6 +53,8 @@ typedef struct
 } Measurement_state;
 
 extern SemaphoreHandle_t sema_measurement;
+extern SemaphoreHandle_t sema_mutex;
+
 extern Dataset_int dataset_resistance;
 extern Dataset_int dataset_co2;
 extern Dataset_float dataset_temperature;
