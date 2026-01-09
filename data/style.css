@@ -26,12 +26,26 @@ body {
     box-sizing: border-box;
 }
 
+.logo {
+    /*position: relative;
+    width: 120px;
+    */
+    float: right;
+    max-width: 120px;
+    height: auto;
+    z-index: 1000;
+}
+
 /* um eine Responsiveness zu gewährleisten */
 @media (max-width: 700px) {
     .container {
         max-width: 98vw;
         margin: 0.5rem;
         padding: 1rem;
+    }
+
+    .logo {
+        max-width: 90px;
     }
 
     table,
