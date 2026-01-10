@@ -831,8 +831,8 @@ esp_err_t style_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    // Setze Cache-Header (7 Tage)
-    httpd_resp_set_hdr(req, "Cache-Control", "public, max-age=604800, immutable");
+    // Setze Cache-Header (24 Stunden)
+    httpd_resp_set_hdr(req, "Cache-Control", "public, max-age=86400");
 
     // ETag für besseres Caching
     char etag[32];
@@ -891,8 +891,8 @@ esp_err_t favicon_handler(httpd_req_t *req)
         return ESP_OK;
     }
 
-    // Setze Cache-Header (7 Tage = 604800 Sekunden)
-    httpd_resp_set_hdr(req, "Cache-Control", "public, max-age=604800, immutable");
+    // Setze Cache-Header (24 Stunden)
+    httpd_resp_set_hdr(req, "Cache-Control", "public, max-age=86400");
 
     // Optional: ETag für besseres Caching
     char etag[32];

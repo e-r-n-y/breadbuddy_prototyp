@@ -239,7 +239,7 @@ void calculate_remaining_time(Measurement_state *state)
     float starter_anteil = probendaten.starter.menge_g / (probendaten.mehl.menge_g + probendaten.wasser.menge_g + probendaten.starter.menge_g + probendaten.salz.menge_g) * 100.0f;
     float verduennungsfaktor = 100.0f / starter_anteil;
     float verdoppelungen = log2(verduennungsfaktor);
-    float verdoppelungszeit = 2.60; // TODO: Dieser Faktor ist die Zeitabhängige komponenten und hier sollten Faktoren wie Temp einfließen
+    float verdoppelungszeit = 2.50; // TODO: Dieser Faktor ist die Zeitabhängige komponenten und hier sollten Faktoren wie Temp einfließen
     float gesamtdauer = verdoppelungen * verdoppelungszeit;
     time_t remaining_time_5 = (time_t)(gesamtdauer * 3600) - state->elapsed_time;
     ESP_LOGI("ANALYSIS_5", "Anteil Starter %.2f%%", (probendaten.starter.menge_g / probendaten.mehl.menge_g * 100.0f));
