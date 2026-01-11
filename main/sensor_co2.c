@@ -107,6 +107,9 @@ void co2_task(void *pvParameters)
                 continue;
             }
 
+            // FIXME: Messungkorrektur laut Kalibrierungsmessung +1.0 °C
+            temperature = temperature + 1.0;
+
             ESP_LOGI(TAG_CO2, "CO2: %u ppm", co2);
             ESP_LOGI(TAG_CO2, "Temperature: %.2f °C", temperature);
             ESP_LOGI(TAG_CO2, "Humidity: %.2f %%\n", current_humidity);

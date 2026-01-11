@@ -91,6 +91,7 @@ esp_err_t D6T_1A_01_read_temperatur(i2c_dev_t *dev, float *temperature)
 
             float tPTAT = (float)tPTAT_raw / 10.0;
             float tP0 = (float)tP0_raw / 10.0;
+
             *temperature = tP0;
 
             ESP_LOGI(TAG_TEMP, "Ref Temp (PTAT): %.1f °C | Object Temp (P0): %.1f °C", tPTAT, tP0);
@@ -193,6 +194,9 @@ void temp_task(void *pvParameter)
 
             // Lese Umgebungstemperatur
             // esp_err_t res_amb = mlx90614_read_temperature(&temp_dev, MLX90614_TA, &temp_ambient);
+
+            // FIXME: Messungkorrektur laut Kalibrierungsmessungen +0.3 °C
+            temp_object = temp_object + 0.3;
 
             if (res_obj == ESP_OK) // && res_amb == ESP_OK)
             {
